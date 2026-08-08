@@ -8,6 +8,19 @@
 <f:view>
     <h:head></h:head>
     <h:body>
+        <h:form>
+            <p:growl>
+                <p:panel header="login">
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputLabel for="username" value="Correo:" />
+                        <h:inputText id="username" value="#{loginBean.correo}" required="true" />
+                        <h:outputLabel for="password" value="Contraseña:" />
+                        <h:inputSecret id="password" value="#{loginBean.contrasena}" required="true" />
+                        <h:commandButton value="Login" action="#{loginBean.login}" />
+                    </h:panelGrid>
+                </p:panel>
+            </p:growl>
+        </h:form>
 
     </h:body>
 </f:view>

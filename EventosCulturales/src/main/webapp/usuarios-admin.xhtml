@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Administración de Usuarios</title>
+    <link rel="stylesheet" href="css/principal.css"/>
+    <h:outputStylesheet name="primefaces.css"/>
+</h:head>
+<h:body>
+    <f:view>
+        <p:menubar styleClass="navbar">
+            <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
+            <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+        </p:menubar>
+
+        <div class="main-container">
+            <h:form>
+                <div class="page-header">
+                    <h1>👥 Gestión de Usuarios</h1>
+                    <p:button value="✨ Crear Nuevo Usuario" icon="pi pi-plus"
+                            onclick="PF('dlgUsuario').show();" styleClass="btn-primary"/>
+                </div>
+
+                <p:messages id="mensajes" showDetail="true" closable="true" />
+
+                <!-- Tabla de Usuarios -->
+                <p:dataTable id="tblUsuarios"
+                           value="#{usuariosBean.usuarios}"
+                           var="usuario"
+                           rowsPerPageTemplate="5,10,15"
+                           paginator="true"
+                           rows="10"
+                           styleClass="eventos-table"
+                           emptyMessage="No hay usuarios registrados">
+
+                    <p:column headerText="Nombre" width="25%">
+                        <h:outputText value="#{usuario.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Correo" width="30%">
+                        <h:outputText value="#{usuario.correo}" />
+                    </p:column>
+
+                    <p:column headerText="Rol" width="20%">
+                        <p:tag value="#{usuario.roleId == 1 ? 'Administrador' : usuario.roleId == 2 ? 'Organizador' : 'Cliente'}"
+                             severity="#{usuario.roleId == 1 ? 'danger' : usuario.roleId == 2 ? 'warning' : 'info'}" />
+                    </p:column>
+
+                    <p:column headerText="Fecha Registro" width="15%">
+                        <h:outputText value="#{usuario.fechaRegistro}">
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Acciones" width="10%">
+                        <p:commandButton value="Editar"
+                                       action="#{usuariosBean.abrirDialogoEditar()}"
+                                       process="tblUsuarios"
+                                       update="dlgUsuario"
+                                       onclick="PF('dlgUsuario').show();"
+                                       icon="pi pi-pencil">
+                            <f:setPropertyActionListener value="#{usuario}" target="#{usuariosBean.usuarioSeleccionado}" />
+                        </p:commandButton>
+                        <p:commandButton value="Eliminar"
+                                       action="#{usuariosBean.eliminar()}"
+                                       process="tblUsuarios"
+                                       update="tblUsuarios,mensajes"
+                                       icon="pi pi-trash"
+                                       styleClass="btn-danger"
+                                       onclick="return confirm('¿Está seguro?');">
+                            <f:setPropertyActionListener value="#{usuario}" target="#{usuariosBean.usuarioSeleccionado}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <!-- Diálogo para Crear/Editar Usuario -->
+                <p:dialog header="Usuario" widgetVar="dlgUsuario" modal="true" width="500px">
+                    <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
+
+                        <p:outputLabel value="Nombre:" />
+                        <p:inputText value="#{usuariosBean.usuarioNuevo.nombre}"
+                                   required="true"
+                                   requiredMessage="Nombre requerido"
+                                   styleClass="w-100"/>
+
+                        <p:outputLabel value="Correo:" />
+                        <p:inputText value="#{usuariosBean.usuarioNuevo.correo}"
+                                   type="email"
+                                   required="true"
+                                   requiredMessage="Correo requerido"
+                                   styleClass="w-100"/>
+
+                        <p:outputLabel value="Rol:" />
+                        <p:selectOneMenu value="#{usuariosBean.usuarioNuevo.roleId}" required="true">
+                            <f:selectItem itemLabel="-- Selecciona un rol --" itemValue="0"/>
+                            <f:selectItems value="#{usuariosBean.roles}"
+                                         var="rol"
+                                         itemLabel="#{rol.nombre}"
+                                         itemValue="#{rol.id}"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Contraseña:" />
+                        <p:password value="#{usuariosBean.contrasenaNueva}"
+                                  feedback="false"
+                                  required="true"
+                                  requiredMessage="Contraseña requerida"
+                                  styleClass="w-100"/>
+                    </p:panelGrid>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                       action="#{usuariosBean.guardar()}"
+                                       process="@form"
+                                       update="tblUsuarios,mensajes"
+                                       onclick="PF('dlgUsuario').hide();"
+                                       icon="pi pi-check"/>
+                        <p:commandButton value="Cancelar"
+                                       action="#{usuariosBean.cancelar()}"
+                                       process="@this"
+                                       onclick="PF('dlgUsuario').hide();"
+                                       icon="pi pi-times"
+                                       styleClass="btn-secondary"/>
+                    </f:facet>
+                </p:dialog>
+            </h:form>
+        </div>
+    </f:view>
+</h:body>
+</html>

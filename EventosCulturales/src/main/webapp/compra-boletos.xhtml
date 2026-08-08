@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Compra de Boletos</title>
+    <link rel="stylesheet" href="css/principal.css"/>
+    <h:outputStylesheet name="primefaces.css"/>
+</h:head>
+<h:body>
+    <f:view>
+        <p:menubar styleClass="navbar">
+            <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
+            <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+        </p:menubar>
+
+        <div class="main-container">
+            <h:form id="formCompra">
+                <div class="page-header">
+                    <h1>🎫 Compra y Reserva de Boletos</h1>
+                </div>
+
+                <p:messages id="mensajes" showDetail="true" closable="true" />
+
+                <!-- Seleccionar Evento -->
+                <p:panel header="Paso 1: Seleccionar Evento" styleClass="form-panel">
+                    <p:panelGrid columns="2" layout="grid">
+                        <p:outputLabel value="Evento:" />
+                        <p:selectOneMenu value="#{compraBoletosBean.eventoSeleccionado}" 
+                                       required="true"
+                                       converter="omnifaces.SelectItemsConverter"
+                                       style="width: 100%">
+                            <f:selectItem itemLabel="-- Selecciona un evento --" itemValue="#{null}"/>
+                            <f:selectItems value="#{compraBoletosBean.eventos}" 
+                                         var="evento" 
+                                         itemLabel="#{evento.titulo} (#{evento.fechaHora})" 
+                                         itemValue="#{evento}"/>
+                            <p:ajax event="change" listener="#{compraBoletosBean.seleccionarEvento()}"
+                                  update="panelAsientos,lblAsientos"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                </p:panel>
+
+                <!-- Detalles del Evento -->
+                <p:panel header="Detalles del Evento" styleClass="form-panel" rendered="#{compraBoletosBean.eventoSeleccionado != null}">
+                    <p:panelGrid columns="4" layout="grid">
+                        <p:outputLabel value="Categoría:" />
+                        <h:outputText value="#{compraBoletosBean.eventoSeleccionado.categoria}" />
+
+                        <p:outputLabel value="Fecha:" />
+                        <h:outputText value="#{compraBoletosBean.eventoSeleccionado.fechaHora}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+
+                        <p:outputLabel value="Ubicación:" />
+                        <h:outputText value="#{compraBoletosBean.eventoSeleccionado.ubicacion}" />
+
+                        <p:outputLabel value="Precio por Boleto:" />
+                        <h:outputText value="$#{String.format('%.2f', compraBoletosBean.eventoSeleccionado.precioBoieto)}" />
+
+                        <p:outputLabel value="Descripción:" />
+                        <h:outputText value="#{compraBoletosBean.eventoSeleccionado.descripcion}" colspan="3"/>
+                    </p:panelGrid>
+                </p:panel>
+
+                <!-- Seleccionar Asientos -->
+                <p:panel id="panelAsientos" header="Paso 2: Seleccionar Asientos" 
+                        styleClass="form-panel" 
+                        rendered="#{compraBoletosBean.eventoSeleccionado != null}">
+                    <p:outputLabel id="lblAsientos" 
+                                 value="Asientos disponibles: #{compraBoletosBean.asientosDisponibles}"/>
+                    
+                    <p:selectCheckboxMenu value="#{compraBoletosBean.asientosSeleccionados}"
+                                        label="Selecciona los asientos"
+                                        style="width: 100%; margin-top: 10px;">
+                        <f:selectItems value="#{compraBoletosBean.asientosDisponibles}" 
+                                     var="asiento" 
+                                     itemLabel="#{asiento.numeroAsiento}" 
+                                     itemValue="#{asiento.numeroAsiento}"/>
+                        <p:ajax event="change" listener="#{compraBoletosBean.actualizarTotal()}"
+                              update="lblTotal"/>
+                    </p:selectCheckboxMenu>
+                </p:panel>
+
+                <!-- Resumen de Compra -->
+                <p:panel header="Paso 3: Resumen de Compra" 
+                        styleClass="form-panel"
+                        rendered="#{compraBoletosBean.eventoSeleccionado != null}">
+                    <p:panelGrid columns="2" layout="grid">
+                        <p:outputLabel value="Cantidad de Boletos:" />
+                        <h:outputText value="#{compraBoletosBean.asientosSeleccionados.size()}" />
+
+                        <p:outputLabel value="Precio Unitario:" />
+                        <h:outputText value="$#{String.format('%.2f', compraBoletosBean.eventoSeleccionado.precioBoieto)}" />
+
+                        <p:outputLabel id="lblTotal" value="Total a Pagar:" styleClass="total-label" />
+                        <h:outputText value="$#{String.format('%.2f', compraBoletosBean.totalPago)}" 
+                                    styleClass="total-value" />
+                    </p:panelGrid>
+
+                    <p:commandButton value="💳 Procesar Compra"
+                                   action="#{compraBoletosBean.procesarCompra()}"
+                                   process="@form"
+                                   update="mensajes,panelAsientos,formCompra"
+                                   icon="pi pi-check"
+                                   styleClass="btn-primary"
+                                   style="margin-top: 20px; width: 100%;"/>
+                </p:panel>
+
+                <!-- Mis Reservas y Boletos -->
+                <p:panel header="🎫 Mis Reservas y Boletos" styleClass="form-panel" style="margin-top: 30px;">
+                    <p:commandButton value="Recargar" 
+                                   action="#{compraBoletosBean.cargarBoletosYReservas()}"
+                                   process="@this"
+                                   update="tblBoletos,tblReservas"
+                                   icon="pi pi-refresh"
+                                   style="margin-bottom: 10px;"/>
+
+                    <h3>Mis Boletos</h3>
+                    <p:dataTable id="tblBoletos"
+                               value="#{compraBoletosBean.misboletos}" 
+                               var="boleto"
+                               emptyMessage="No tienes boletos"
+                               styleClass="eventos-table">
+                        <p:column headerText="Código" width="25%">
+                            <h:outputText value="#{boleto.codigoBoleto}" />
+                        </p:column>
+                        <p:column headerText="Evento ID" width="25%">
+                            <h:outputText value="#{boleto.eventoId}" />
+                        </p:column>
+                        <p:column headerText="Asiento" width="20%">
+                            <h:outputText value="#{boleto.numeroAsiento}" />
+                        </p:column>
+                        <p:column headerText="Fecha Compra" width="30%">
+                            <h:outputText value="#{boleto.fechaCompra}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+
+                    <h3 style="margin-top: 30px;">Mis Reservas</h3>
+                    <p:dataTable id="tblReservas"
+                               value="#{compraBoletosBean.misReservas}" 
+                               var="reserva"
+                               emptyMessage="No tienes reservas"
+                               styleClass="eventos-table">
+                        <p:column headerText="Evento ID" width="25%">
+                            <h:outputText value="#{reserva.eventoId}" />
+                        </p:column>
+                        <p:column headerText="Cantidad Boletos" width="20%">
+                            <h:outputText value="#{reserva.cantidadBoletos}" />
+                        </p:column>
+                        <p:column headerText="Total Pagado" width="20%">
+                            <h:outputText value="$#{String.format('%.2f', reserva.totalPagado)}" />
+                        </p:column>
+                        <p:column headerText="Estado" width="15%">
+                            <p:tag value="#{reserva.estado}" severity="success" />
+                        </p:column>
+                        <p:column headerText="Fecha" width="20%">
+                            <h:outputText value="#{reserva.fechaReserva}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </div>
+    </f:view>
+</h:body>
+</html>

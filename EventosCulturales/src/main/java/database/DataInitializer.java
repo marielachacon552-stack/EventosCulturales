@@ -38,27 +38,27 @@ public class DataInitializer {
             // Admin
             pstmt.setString(1, "Admin Sistema");
             pstmt.setString(2, "admin@eventos.hn");
-            pstmt.setString(3, "$2a$10$QOa2K8JaLqJTqkiU8Bk7MuyRCFvAHJvS2YO5qKEVsB9v3LmH2qmEK"); // admin123
+            pstmt.setString(3, "$2a$10$TMrAOtZ7V8esQNynIrwQt.DFp0z7NMOj/4Q7iITKgXl8nYSTwVZiu"); // admin123
             pstmt.setInt(4, 1);
             pstmt.executeUpdate();
             
             // Organizador
             pstmt.setString(1, "Juan Organizador");
             pstmt.setString(2, "organizador@eventos.hn");
-            pstmt.setString(3, "$2a$10$QOa2K8JaLqJTqkiU8Bk7MuyRCFvAHJvS2YO5qKEVsB9v3LmH2qmEK"); // admin123
+            pstmt.setString(3, "$2a$10$TMrAOtZ7V8esQNynIrwQt.DFp0z7NMOj/4Q7iITKgXl8nYSTwVZiu"); // admin123
             pstmt.setInt(4, 2);
             pstmt.executeUpdate();
             
             // Clientes
             pstmt.setString(1, "Carlos Cliente");
             pstmt.setString(2, "carlos@cliente.hn");
-            pstmt.setString(3, "$2a$10$QOa2K8JaLqJTqkiU8Bk7MuyRCFvAHJvS2YO5qKEVsB9v3LmH2qmEK"); // admin123
+            pstmt.setString(3, "$2a$10$TMrAOtZ7V8esQNynIrwQt.DFp0z7NMOj/4Q7iITKgXl8nYSTwVZiu"); // admin123
             pstmt.setInt(4, 3);
             pstmt.executeUpdate();
             
             pstmt.setString(1, "María Cliente");
             pstmt.setString(2, "maria@cliente.hn");
-            pstmt.setString(3, "$2a$10$QOa2K8JaLqJTqkiU8Bk7MuyRCFvAHJvS2YO5qKEVsB9v3LmH2qmEK"); // admin123
+            pstmt.setString(3, "$2a$10$TMrAOtZ7V8esQNynIrwQt.DFp0z7NMOj/4Q7iITKgXl8nYSTwVZiu"); // admin123
             pstmt.setInt(4, 3);
             pstmt.executeUpdate();
             

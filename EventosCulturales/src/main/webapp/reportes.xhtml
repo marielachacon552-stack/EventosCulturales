@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -10,53 +10,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Reportes y Estadísticas</title>
     <link rel="stylesheet" href="css/principal.css"/>
-    <h:outputStylesheet name="primefaces.css"/>
 </h:head>
 <h:body>
     <f:view>
-        <p:menubar styleClass="navbar">
-            <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
-            <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
-        </p:menubar>
-
-        <div class="main-container">
+        <div class="app-wrapper">
+            <!-- Barra Lateral / Menú Principal -->
             <h:form>
-                <div class="page-header">
-                    <h1>📊 Reportes y Estadísticas</h1>
-                    <p:button value="📥 Exportar PDF" onclick="alert('Exportar PDF')" icon="pi pi-download" styleClass="btn-secondary"/>
-                    <p:button value="📊 Exportar Excel" onclick="alert('Exportar Excel')" icon="pi pi-download" styleClass="btn-secondary"/>
-                </div>
-
-                <!-- Resumen General -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">#{reportesBean.totalBoletosVendidos}</div>
-                        <div class="stat-label">Boletos Vendidos</div>
-                        <div class="stat-icon">🎫</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">$#{String.format('%.2f', reportesBean.totalVentasGlobal)}</div>
-                        <div class="stat-label">Ventas Totales</div>
-                        <div class="stat-icon">💰</div>
-                    </div>
-                </div>
-
-                <!-- Gráfico de Ventas por Categoría -->
-                <p:panel header="💼 Ventas por Categoría" styleClass="chart-panel">
-                    <p:chart type="pie" 
-                           model="#{reportesBean.ventasPorCategoria}"
-                           responsive="true"
-                           style="width: 100%; height: 400px;"/>
-                </p:panel>
-
-                <!-- Gráfico de Asistencia -->
-                <p:panel header="👥 Asistencia por Categoría" styleClass="chart-panel" style="margin-top: 30px;">
-                    <p:chart type="bar"
-                           model="#{reportesBean.asistenciaPorCategoria}"
-                           responsive="true"
-                           style="width: 100%; height: 400px;"/>
-                </p:panel>
+                <p:menubar styleClass="navbar">
+                    <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
+                    <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+                </p:menubar>
             </h:form>
+
+            <!-- Contenedor Principal a la derecha de la barra lateral -->
+            <div class="main-container">
+                <h:form>
+                    <div class="page-header">
+                        <h1>📊 Reportes y Estadísticas</h1>
+                        <p:button value="📥 Exportar PDF" onclick="alert('Exportar PDF')" icon="pi pi-download" styleClass="btn-secondary"/>
+                        <p:button value="📊 Exportar Excel" onclick="alert('Exportar Excel')" icon="pi pi-download" styleClass="btn-secondary"/>
+                    </div>
+
+                    <!-- Resumen General -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">#{reportesBean.totalBoletosVendidos}</div>
+                            <div class="stat-label">Boletos Vendidos</div>
+                            <div class="stat-icon">🎫</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">L. #{String.format('%.2f', reportesBean.totalVentasGlobal)}</div>
+                            <div class="stat-label">Ventas Totales</div>
+                            <div class="stat-icon">💰</div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de Ventas por Categoría -->
+                    <p:panel header="💼 Ventas por Categoría" styleClass="chart-panel">
+                        <p:chart type="pie"
+                                 model="#{reportesBean.ventasPorCategoria}"
+                                 responsive="true"
+                                 style="width: 100%; height: 400px;"/>
+                    </p:panel>
+
+                    <!-- Gráfico de Asistencia -->
+                    <p:panel header="👥 Asistencia por Categoría" styleClass="chart-panel" style="margin-top: 30px;">
+                        <p:chart type="bar"
+                                 model="#{reportesBean.asistenciaPorCategoria}"
+                                 responsive="true"
+                                 style="width: 100%; height: 400px;"/>
+                    </p:panel>
+                </h:form>
+            </div>
         </div>
     </f:view>
 </h:body>

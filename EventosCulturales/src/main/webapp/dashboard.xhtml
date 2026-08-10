@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -10,84 +10,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Eventos Culturales - Dashboard</title>
     <link rel="stylesheet" href="css/principal.css"/>
-    <h:outputStylesheet name="primefaces.css"/>
 </h:head>
 <h:body>
     <f:view>
-        <p:menubar styleClass="navbar">
-            <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
-            
-            <p:submenu label="📅 Gestión de Eventos" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
-                <p:menuitem value="Administrar Eventos" url="eventos-admin.xhtml" />
-            </p:submenu>
-
-            <p:submenu label="🎫 Compra de Boletos" rendered="#{dashboardBean.esCliente()}">
-                <p:menuitem value="Comprar Boletos" url="compra-boletos.xhtml" />
-                <p:menuitem value="Mis Reservas" url="mis-reservas.xhtml" />
-            </p:submenu>
-
-            <p:submenu label="📊 Reportes" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
-                <p:menuitem value="Ver Reportes" url="reportes.xhtml" />
-            </p:submenu>
-
-            <p:submenu label="👥 Administración" rendered="#{dashboardBean.esAdmin()}">
-                <p:menuitem value="Gestionar Usuarios" url="usuarios-admin.xhtml" />
-            </p:submenu>
-
-            <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
-        </p:menubar>
-
-        <div class="main-container">
+        <div class="app-wrapper">
+            <!-- Barra Lateral / Menú Principal -->
             <h:form>
-                <div class="dashboard-header">
-                    <h1>🎭 Bienvenido, #{dashboardBean.usuarioActual.nombre}</h1>
-                    <p class="subtitle">Sistema de Reservas para Eventos Culturales</p>
-                </div>
+                <p:menubar styleClass="navbar">
+                    <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
 
-                <!-- Resumen de Estadísticas (Admin y Organizador) -->
-                <div class="stats-grid" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
-                    <div class="stat-card">
-                        <div class="stat-number">#{dashboardBean.totalBoletosVendidos}</div>
-                        <div class="stat-label">Boletos Vendidos</div>
-                        <div class="stat-icon">🎫</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">$#{String.format('%.2f', dashboardBean.totalIngresos)}</div>
-                        <div class="stat-label">Ingresos Totales</div>
-                        <div class="stat-icon">💰</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">#{dashboardBean.eventosProximos.size()}</div>
-                        <div class="stat-label">Eventos Próximos</div>
-                        <div class="stat-icon">📅</div>
-                    </div>
-                </div>
+                    <p:submenu label="📅 Gestión de Eventos" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        <p:menuitem value="Administrar Eventos" url="eventos-admin.xhtml" />
+                    </p:submenu>
 
-                <!-- Lista de Eventos Próximos -->
-                <div class="eventos-section">
-                    <h2>📅 Eventos Próximos</h2>
-                    <p:dataTable value="#{dashboardBean.eventosProximos}" var="evento" styleClass="eventos-table">
-                        <p:column headerText="Evento" width="30%">
-                            <h:outputText value="#{evento.titulo}" />
-                        </p:column>
-                        <p:column headerText="Categoría" width="15%">
-                            <p:tag value="#{evento.categoria}" severity="info" />
-                        </p:column>
-                        <p:column headerText="Fecha" width="20%">
-                            <h:outputText value="#{evento.fechaHora}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="Precio" width="15%">
-                            <h:outputText value="$#{String.format('%.2f', evento.precioBoieto)}" />
-                        </p:column>
-                        <p:column headerText="Acción" width="20%">
-                            <p:button value="Ver Detalles" icon="pi pi-arrow-right" 
-                                    onclick="PF('dlgDetalle').show();" />
-                        </p:column>
-                    </p:dataTable>
-                </div>
+                    <p:submenu label="🎫 Compra de Boletos" rendered="#{dashboardBean.esCliente()}">
+                        <p:menuitem value="Comprar Boletos" url="compra-boletos.xhtml" />
+                    </p:submenu>
+
+                    <p:submenu label="📊 Reportes" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        <p:menuitem value="Ver Reportes" url="reportes.xhtml" />
+                    </p:submenu>
+
+                    <p:submenu label="👥 Administración" rendered="#{dashboardBean.esAdmin()}">
+                        <p:menuitem value="Gestionar Usuarios" url="usuarios-admin.xhtml" />
+                    </p:submenu>
+
+                    <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+                </p:menubar>
             </h:form>
+
+            <!-- Contenedor Principal a la derecha de la barra lateral -->
+            <div class="main-container">
+                <h:form id="formDashboard">
+                    <div class="dashboard-header">
+                        <h1>🎭 Bienvenido, #{dashboardBean.usuarioActual.nombre}</h1>
+                        <p class="subtitle">Sistema de Reservas para Eventos Culturales</p>
+                    </div>
+
+                    <!-- Resumen de Estadísticas (Admin y Organizador) -->
+                    <p:outputPanel styleClass="stats-grid" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        <div class="stat-card">
+                            <div class="stat-number">#{dashboardBean.totalBoletosVendidos}</div>
+                            <div class="stat-label">Boletos Vendidos</div>
+                            <div class="stat-icon">🎫</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">L. #{String.format('%.2f', dashboardBean.totalIngresos)}</div>
+                            <div class="stat-label">Ingresos Totales</div>
+                            <div class="stat-icon">💰</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">#{dashboardBean.eventosProximos.size()}</div>
+                            <div class="stat-label">Eventos Próximos</div>
+                            <div class="stat-icon">📅</div>
+                        </div>
+                    </p:outputPanel>
+
+                    <!-- Lista de Eventos Próximos -->
+                    <div class="eventos-section">
+                        <h2>📅 Eventos Próximos</h2>
+                        <p:dataTable value="#{dashboardBean.eventosProximos}" var="evento" styleClass="eventos-table">
+                            <p:column headerText="Evento" width="30%">
+                                <h:outputText value="#{evento.titulo}" />
+                            </p:column>
+                            <p:column headerText="Categoría" width="15%">
+                                <p:tag value="#{evento.categoria}" severity="info" />
+                            </p:column>
+                            <p:column headerText="Fecha" width="20%">
+                                <h:outputText value="#{evento.fechaHora}" />
+                            </p:column>
+                            <p:column headerText="Precio" width="15%">
+                                <h:outputText value="L. #{String.format('%.2f', evento.precioBoleto)}" />
+                            </p:column>
+                            <p:column headerText="Acción" width="20%">
+                                <p:commandButton value="Ver Detalles" icon="pi pi-arrow-right"
+                                                 action="#{dashboardBean.verDetalles(evento)}"
+                                                 process="@this"
+                                                 update=":formDashboard:dlgDetalle"
+                                                 oncomplete="PF('dlgDetalle').show();" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+
+                    <!-- Diálogo de Detalles del Evento -->
+                    <p:dialog id="dlgDetalle" header="Detalles del Evento" widgetVar="dlgDetalle" modal="true" responsive="true" width="500">
+                        <p:outputPanel id="panelDetalle">
+                            <p:outputPanel rendered="#{dashboardBean.eventoDetalles != null}">
+                                <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
+                                    <p:outputLabel value="Título:" />
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.titulo}" />
+
+                                    <p:outputLabel value="Categoría:" />
+                                    <p:tag value="#{dashboardBean.eventoDetalles.categoria}" severity="info" />
+
+                                    <p:outputLabel value="Fecha y Hora:" />
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.fechaHora}" />
+
+                                    <p:outputLabel value="Duración:" />
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.duracion} minutos" />
+
+                                    <p:outputLabel value="Ubicación:" />
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.ubicacion}" />
+
+                                    <p:outputLabel value="Precio del Boleto:" />
+                                    <h:outputText value="L. #{String.format('%.2f', dashboardBean.eventoDetalles.precioBoleto)}" />
+
+                                    <p:outputLabel value="Aforo Máximo:" />
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.aforoMaximo}" />
+
+                                    <p:outputLabel value="Descripción:" />
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.descripcion}" styleClass="description" escape="false"/>
+                                </p:panelGrid>
+                            </p:outputPanel>
+                            <p:outputPanel rendered="#{dashboardBean.eventoDetalles == null}">
+                                <p:outputLabel value="Selecciona un evento para ver su información completa." />
+                            </p:outputPanel>
+                        </p:outputPanel>
+                    </p:dialog>
+                </h:form>
+            </div>
         </div>
     </f:view>
 </h:body>

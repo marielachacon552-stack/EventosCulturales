@@ -1,15 +1,18 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
-public class Evento {
+public class Evento implements Serializable {
     private int id;
     private String titulo;
     private String categoria;
     private LocalDateTime fechaHora;
     private int duracion;
     private String descripcion;
-    private double precioBoieto;
+    private double precioBoleto;
     private int aforoMaximo;
     private String ubicacion;
     private String estado;
@@ -18,13 +21,13 @@ public class Evento {
     public Evento() {}
 
     public Evento(String titulo, String categoria, LocalDateTime fechaHora, int duracion,
-                  String descripcion, double precioBoieto, int aforoMaximo, String ubicacion) {
+                  String descripcion, double precioBoleto, int aforoMaximo, String ubicacion) {
         this.titulo = titulo;
         this.categoria = categoria;
         this.fechaHora = fechaHora;
         this.duracion = duracion;
         this.descripcion = descripcion;
-        this.precioBoieto = precioBoieto;
+        this.precioBoleto = precioBoleto;
         this.aforoMaximo = aforoMaximo;
         this.ubicacion = ubicacion;
         this.estado = "activo";
@@ -78,12 +81,12 @@ public class Evento {
         this.descripcion = descripcion;
     }
 
-    public double getPrecioBoieto() {
-        return precioBoieto;
+    public double getPrecioBoleto() {
+        return precioBoleto;
     }
 
-    public void setPrecioBoieto(double precioBoieto) {
-        this.precioBoieto = precioBoieto;
+    public void setPrecioBoleto(double precioBoleto) {
+        this.precioBoleto = precioBoleto;
     }
 
     public int getAforoMaximo() {
@@ -116,6 +119,26 @@ public class Evento {
 
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getFechaHoraFormateada() {
+        if (this.fechaHora != null) {
+            return this.fechaHora.format(DateTimeFormatter.ofPattern("yyyy-MM-dd 'Hora:' HH:mm"));
+        }
+        return "";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Evento evento = (Evento) o;
+        return id == evento.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

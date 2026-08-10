@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -10,145 +10,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Gestión de Eventos</title>
     <link rel="stylesheet" href="css/principal.css"/>
-    <h:outputStylesheet name="primefaces.css"/>
 </h:head>
 <h:body>
     <f:view>
-        <p:menubar styleClass="navbar">
-            <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
-            <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
-        </p:menubar>
-
-        <div class="main-container">
+        <div class="app-wrapper">
+            <!-- Barra Lateral / Menú Principal -->
             <h:form>
-                <div class="page-header">
-                    <h1>📅 Gestión de Eventos Culturales</h1>
-                    <p:button value="✨ Crear Nuevo Evento" icon="pi pi-plus" 
-                            onclick="PF('dlgEvento').show();" styleClass="btn-primary"/>
-                </div>
-
-                <p:messages id="mensajes" showDetail="true" closable="true" />
-
-                <!-- Tabla de Eventos -->
-                <p:dataTable id="tblEventos"
-                           value="#{eventoCrudBean.eventos}" 
-                           var="evento"
-                           rowsPerPageTemplate="5,10,15"
-                           paginator="true"
-                           rows="10"
-                           styleClass="eventos-table"
-                           emptyMessage="No hay eventos registrados">
-
-                    <p:column headerText="Evento" width="25%">
-                        <h:outputText value="#{evento.titulo}" />
-                    </p:column>
-
-                    <p:column headerText="Categoría" width="12%">
-                        <p:tag value="#{evento.categoria}" severity="info" />
-                    </p:column>
-
-                    <p:column headerText="Fecha y Hora" width="18%">
-                        <h:outputText value="#{evento.fechaHora}">
-                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
-                        </h:outputText>
-                    </p:column>
-
-                    <p:column headerText="Precio" width="12%">
-                        <h:outputText value="$#{String.format('%.2f', evento.precioBoieto)}" />
-                    </p:column>
-
-                    <p:column headerText="Aforo" width="10%">
-                        <h:outputText value="#{evento.aforoMaximo}" />
-                    </p:column>
-
-                    <p:column headerText="Acciones" width="23%">
-                        <p:commandButton value="Editar" 
-                                       action="#{eventoCrudBean.abrirDialogoEditar()}"
-                                       process="tblEventos"
-                                       update="dlgEvento"
-                                       onclick="PF('dlgEvento').show();"
-                                       icon="pi pi-pencil">
-                            <f:setPropertyActionListener value="#{evento}" target="#{eventoCrudBean.eventoSeleccionado}" />
-                        </p:commandButton>
-                        <p:commandButton value="Eliminar" 
-                                       action="#{eventoCrudBean.eliminar()}"
-                                       process="tblEventos"
-                                       update="tblEventos,mensajes"
-                                       icon="pi pi-trash"
-                                       styleClass="btn-danger"
-                                       onclick="return confirm('¿Está seguro?');">
-                            <f:setPropertyActionListener value="#{evento}" target="#{eventoCrudBean.eventoSeleccionado}" />
-                        </p:commandButton>
-                    </p:column>
-                </p:dataTable>
-
-                <!-- Diálogo para Crear/Editar Evento -->
-                <p:dialog header="Evento" widgetVar="dlgEvento" modal="true" width="600px">
-                    <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
-                        
-                        <p:outputLabel value="Título:" />
-                        <p:inputText value="#{eventoCrudBean.eventoNuevo.titulo}" 
-                                   required="true" 
-                                   requiredMessage="Título requerido"
-                                   styleClass="w-100"/>
-
-                        <p:outputLabel value="Categoría:" />
-                        <p:selectOneMenu value="#{eventoCrudBean.eventoNuevo.categoria}" required="true">
-                            <f:selectItem itemLabel="-- Selecciona --" itemValue=""/>
-                            <f:selectItem itemLabel="Teatro" itemValue="teatro"/>
-                            <f:selectItem itemLabel="Concierto" itemValue="concierto"/>
-                            <f:selectItem itemLabel="Exposición" itemValue="exposición"/>
-                        </p:selectOneMenu>
-
-                        <p:outputLabel value="Fecha y Hora:" />
-                        <p:calendar value="#{eventoCrudBean.eventoNuevo.fechaHora}" 
-                                  pattern="dd/MM/yyyy HH:mm"
-                                  showTime="true"
-                                  required="true"/>
-
-                        <p:outputLabel value="Duración (minutos):" />
-                        <p:inputNumber value="#{eventoCrudBean.eventoNuevo.duracion}" 
-                                     required="true" 
-                                     styleClass="w-100"/>
-
-                        <p:outputLabel value="Descripción:" />
-                        <p:inputTextarea value="#{eventoCrudBean.eventoNuevo.descripcion}" 
-                                       rows="3" 
-                                       styleClass="w-100"/>
-
-                        <p:outputLabel value="Precio del Boleto:" />
-                        <p:inputNumber value="#{eventoCrudBean.eventoNuevo.precioBoieto}" 
-                                     required="true"
-                                     decimalPlaces="2"
-                                     styleClass="w-100"/>
-
-                        <p:outputLabel value="Aforo Máximo:" />
-                        <p:inputNumber value="#{eventoCrudBean.eventoNuevo.aforoMaximo}" 
-                                     required="true" 
-                                     styleClass="w-100"/>
-
-                        <p:outputLabel value="Ubicación:" />
-                        <p:inputText value="#{eventoCrudBean.eventoNuevo.ubicacion}" 
-                                   required="true" 
-                                   styleClass="w-100"/>
-                    </p:panelGrid>
-
-                    <f:facet name="footer">
-                        <p:commandButton value="Guardar" 
-                                       action="#{eventoCrudBean.guardar()}"
-                                       process="@form"
-                                       update="tblEventos,mensajes"
-                                       onclick="PF('dlgEvento').hide();"
-                                       icon="pi pi-check"/>
-                        <p:commandButton value="Cancelar" 
-                                       action="#{eventoCrudBean.cancelar()}"
-                                       process="@this"
-                                       onclick="PF('dlgEvento').hide();"
-                                       icon="pi pi-times"
-                                       styleClass="btn-secondary"/>
-                    </f:facet>
-                </p:dialog>
+                <p:menubar styleClass="navbar">
+                    <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
+                    <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+                </p:menubar>
             </h:form>
+
+            <!-- Contenedor Principal a la derecha de la barra lateral -->
+            <div class="main-container">
+                <h:form id="formAdminEventos">
+                    <div class="page-header">
+                        <h1>📅 Gestión de Eventos Culturales</h1>
+                        <p:commandButton value="✨ Crear Nuevo Evento"
+                                         icon="pi pi-plus"
+                                         action="#{eventoCrudBean.abrirDialogoNuevo()}"
+                                         process="@this"
+                                         update=":formAdminEventos:dlgEvento"
+                                         oncomplete="PF('dlgEvento').show();"
+                                         styleClass="btn-primary"/>
+                    </div>
+
+                    <p:messages id="mensajes" showDetail="true" closable="true" />
+
+                    <!-- Tabla de Eventos -->
+                    <p:dataTable id="tblEventos"
+                                 value="#{eventoCrudBean.eventos}"
+                                 var="evento"
+                                 rowsPerPageTemplate="5,10,15"
+                                 paginator="true"
+                                 rows="10"
+                                 styleClass="eventos-table"
+                                 emptyMessage="No hay eventos registrados">
+
+                        <p:column headerText="Evento" width="25%">
+                            <h:outputText value="#{evento.titulo}" />
+                        </p:column>
+
+                        <p:column headerText="Categoría" width="12%">
+                            <p:tag value="#{evento.categoria}" severity="info" />
+                        </p:column>
+
+                        <p:column headerText="Fecha y Hora" width="22%">
+                            <h:outputText value="#{evento.fechaHoraFormateada}" />
+                        </p:column>
+
+                        <p:column headerText="Precio" width="12%">
+                            <h:outputText value="L. #{evento.precioBoleto}">
+                                <f:convertNumber pattern="#,##0.00" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Aforo" width="10%">
+                            <h:outputText value="#{evento.aforoMaximo}" />
+                        </p:column>
+
+                        <p:column headerText="Acciones" width="23%">
+                            <p:commandButton value="Editar"
+                                             action="#{eventoCrudBean.abrirDialogoEditar()}"
+                                             process="tblEventos"
+                                             update=":formAdminEventos:dlgEvento"
+                                             oncomplete="PF('dlgEvento').show();"
+                                             icon="pi pi-pencil">
+                                <f:setPropertyActionListener value="#{evento}" target="#{eventoCrudBean.eventoSeleccionado}" />
+                            </p:commandButton>
+                            <p:commandButton value="Eliminar"
+                                             action="#{eventoCrudBean.eliminar()}"
+                                             process="tblEventos"
+                                             update="tblEventos,mensajes"
+                                             icon="pi pi-trash"
+                                             styleClass="btn-danger"
+                                             onclick="return confirm('¿Está seguro?');">
+                                <f:setPropertyActionListener value="#{evento}" target="#{eventoCrudBean.eventoSeleccionado}" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+
+                    <!-- Diálogo para Crear/Editar Evento -->
+                    <p:dialog id="dlgEvento" header="Evento" widgetVar="dlgEvento" modal="true" width="600px" responsive="true">
+                        <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
+
+                            <p:outputLabel value="Título:" />
+                            <p:inputText value="#{eventoCrudBean.eventoSeleccionado.titulo}"
+                                         required="true"
+                                         requiredMessage="Título requerido"
+                                         styleClass="w-100"/>
+
+                            <p:outputLabel value="Categoría:" />
+                            <p:selectOneMenu value="#{eventoCrudBean.eventoSeleccionado.categoria}" required="true">
+                                <f:selectItem itemLabel="-- Selecciona --" itemValue=""/>
+                                <f:selectItem itemLabel="Teatro" itemValue="teatro"/>
+                                <f:selectItem itemLabel="Concierto" itemValue="concierto"/>
+                                <f:selectItem itemLabel="Exposición" itemValue="exposición"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Fecha y Hora:" />
+                            <p:calendar value="#{eventoCrudBean.eventoSeleccionado.fechaHora}"
+                                        pattern="dd/MM/yyyy HH:mm"
+                                        showTime="true"
+                                        required="true"/>
+
+                            <p:outputLabel value="Duración (minutos):" />
+                            <p:inputNumber value="#{eventoCrudBean.eventoSeleccionado.duracion}"
+                                           required="true"
+                                           styleClass="w-100"/>
+
+                            <p:outputLabel value="Descripción:" />
+                            <p:inputTextarea value="#{eventoCrudBean.eventoSeleccionado.descripcion}"
+                                             rows="3"
+                                             styleClass="w-100"/>
+
+                            <p:outputLabel value="Precio del Boleto:" />
+                            <p:inputNumber value="#{eventoCrudBean.eventoSeleccionado.precioBoleto}"
+                                           required="true"
+                                           decimalPlaces="2"
+                                           styleClass="w-100"/>
+
+                            <p:outputLabel value="Aforo Máximo:" />
+                            <p:inputNumber value="#{eventoCrudBean.eventoSeleccionado.aforoMaximo}"
+                                           required="true"
+                                           styleClass="w-100"/>
+
+                            <p:outputLabel value="Ubicación:" />
+                            <p:inputText value="#{eventoCrudBean.eventoSeleccionado.ubicacion}"
+                                         required="true"
+                                         styleClass="w-100"/>
+                        </p:panelGrid>
+
+                        <f:facet name="footer">
+                            <p:commandButton value="Guardar"
+                                             action="#{eventoCrudBean.guardar()}"
+                                             process="dlgEvento"
+                                             update="tblEventos,mensajes"
+                                             oncomplete="PF('dlgEvento').hide();"
+                                             icon="pi pi-check"/>
+                            <p:commandButton value="Cancelar"
+                                             action="#{eventoCrudBean.cancelar()}"
+                                             process="@this"
+                                             onclick="PF('dlgEvento').hide();"
+                                             icon="pi pi-times"
+                                             styleClass="btn-secondary"/>
+                        </f:facet>
+                    </p:dialog>
+                </h:form>
+            </div>
         </div>
     </f:view>
 </h:body>

@@ -13,41 +13,40 @@ public class AuthenticationService {
     }
 
     public Usuario login(String correo, String contrasena) throws SQLException {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
         Usuario usuario = usuarioDAO.findByCorreo(correo);
-        if (usuario != null && BCrypt.checkpw(contrasena, usuario.getContrasena())) {
-            return usuario;
+        if (usuario != null) {
+            System.out.println("Usuario encontrado: " + usuario.getCorreo());
+            System.out.println("Contrasena/Hash en BD: " + usuario.getContrasena());
+
+            boolean match = false;
+            // Si la contraseña en la BD no empieza con $2a$ (no es un hash de BCrypt), compárala plano contra plano
+            if (usuario.getContrasena() != null && !usuario.getContrasena().startsWith("$2a$")) {
+                match = contrasena.equals(usuario.getContrasena());
+            } else {
+                // Si es un hash válido, usa BCrypt normalmente
+                match = BCrypt.checkpw(contrasena, usuario.getContrasena());
+            }
+
+            System.out.println("Coincide contraseña: " + match);
+            if (match) {
+                return usuario;
+            }
         }
         return null;
     }
-
     public boolean registrar(Usuario usuario, String contrasenaPlana) throws SQLException {
-        try {
-            // Verificar que el correo no exista
-            if (usuarioDAO.findByCorreo(usuario.getCorreo()) != null) {
-                return false;
-            }
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
 
-            // Hashear la contraseña
-            String contrasenaHasheada = BCrypt.hashpw(contrasenaPlana, BCrypt.gensalt());
-            usuario.setContrasena(contrasenaHasheada);
-
-            // Crear el usuario
-            usuarioDAO.create(usuario);
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // Verificar si el correo ya existe
+        if (usuarioDAO.findByCorreo(usuario.getCorreo()) != null) {
             return false;
         }
-    }
 
-    public boolean actualizarContrasena(int usuarioId, String contrasenaActual, String contrasenanueva) throws SQLException {
-        Usuario usuario = usuarioDAO.read(usuarioId);
-        if (usuario != null && BCrypt.checkpw(contrasenaActual, usuario.getContrasena())) {
-            String nuevoHash = BCrypt.hashpw(contrasenanueva, BCrypt.gensalt());
-            usuario.setContrasena(nuevoHash);
-            usuarioDAO.update(usuario);
-            return true;
-        }
-        return false;
+        // Hashear la contraseña antes de guardarla
+        String hashContrasena = BCrypt.hashpw(contrasenaPlana, BCrypt.gensalt());
+        usuario.setContrasena(hashContrasena);
+
+        return usuarioDAO.create(usuario);
     }
 }

@@ -4,7 +4,6 @@ import data.Evento;
 import data.Asiento;
 import data.Boleto;
 import data.Reserva;
-import data.Usuario;
 import database.EventoDAO;
 import database.UsuarioDAO;
 import database.AsientoDAO;
@@ -25,7 +24,7 @@ public class CompraBoletosBean implements Serializable {
     private AsientoDAO asientoDAO;
     private UsuarioDAO usuarioDAO;
     private CompraService compraService;
-    
+
     private List<Evento> eventos;
     private Evento eventoSeleccionado;
     private List<Asiento> asientosDisponibles;
@@ -40,7 +39,11 @@ public class CompraBoletosBean implements Serializable {
         this.usuarioDAO = new UsuarioDAO();
         this.compraService = new CompraService();
         this.asientosSeleccionados = new ArrayList<>();
+        this.asientosDisponibles = new ArrayList<>();
+        this.misboletos = new ArrayList<>();
+        this.misReservas = new ArrayList<>();
         cargarEventos();
+        cargarBoletosYReservas();
     }
 
     public void cargarEventos() {
@@ -48,53 +51,82 @@ public class CompraBoletosBean implements Serializable {
             eventos = eventoDAO.readAll();
         } catch (SQLException e) {
             e.printStackTrace();
+            eventos = new ArrayList<>();
         }
     }
 
     public void seleccionarEvento() {
+        System.out.println("--- EJECUTANDO seleccionarEvento() ---");
         if (eventoSeleccionado != null) {
             try {
+                // RECARGAR EL EVENTO DESDE LA BASE DE DATOS PARA ASEGURAR EL PRECIO
+                this.eventoSeleccionado = eventoDAO.read(eventoSeleccionado.getId());
+
+                System.out.println("Evento seleccionado ID: " + eventoSeleccionado.getId());
+                System.out.println("Precio del boleto cargado: " + eventoSeleccionado.getPrecioBoleto());
+
                 asientosDisponibles = asientoDAO.findDisponiblesByEvento(eventoSeleccionado.getId());
-                asientosSeleccionados.clear();
-                totalPago = 0;
+                asientosSeleccionados = new ArrayList<>();
+                totalPago = 0.0;
             } catch (SQLException e) {
                 e.printStackTrace();
+                asientosDisponibles = new ArrayList<>();
             }
+        } else {
+            System.out.println("El evento seleccionado es NULO");
+            asientosDisponibles = new ArrayList<>();
+            asientosSeleccionados = new ArrayList<>();
+            totalPago = 0.0;
         }
     }
 
     public void actualizarTotal() {
-        totalPago = asientosSeleccionados.size() * eventoSeleccionado.getPrecioBoieto();
+        System.out.println("--- EJECUTANDO actualizarTotal() ---");
+        if (eventoSeleccionado != null && asientosSeleccionados != null) {
+            System.out.println("Cantidad de asientos seleccionados: " + asientosSeleccionados.size());
+            System.out.println("Precio unitario: " + eventoSeleccionado.getPrecioBoleto());
+            totalPago = asientosSeleccionados.size() * eventoSeleccionado.getPrecioBoleto();
+        } else {
+            totalPago = 0.0;
+        }
+        System.out.println("Total calculado: " + totalPago);
     }
 
     public void procesarCompra() {
-        if (asientosSeleccionados.isEmpty()) {
+        if (asientosSeleccionados == null || asientosSeleccionados.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Seleccione al menos un asiento"));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Seleccione al menos un asiento"));
             return;
         }
 
         try {
             Integer usuarioId = (Integer) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuarioId");
-            
+
+            if (usuarioId == null) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontró la sesión del usuario. Inicie sesión nuevamente."));
+                return;
+            }
+
             Reserva reserva = compraService.procesarCompra(usuarioId, eventoSeleccionado.getId(), asientosSeleccionados, usuarioDAO);
-            
+
             if (reserva != null) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "¡Compra realizada! Total: $" + String.format("%.2f", totalPago)));
-                
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "¡Compra realizada! Total: L. " + String.format("%.2f", totalPago)));
+
                 asientosSeleccionados.clear();
-                totalPago = 0;
+                totalPago = 0.0;
+
                 seleccionarEvento();
                 cargarBoletosYReservas();
             } else {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Los asientos seleccionados no están disponibles"));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Los asientos seleccionados no están disponibles"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al procesar la compra"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al procesar la compra"));
         }
     }
 
@@ -110,7 +142,7 @@ public class CompraBoletosBean implements Serializable {
         }
     }
 
-    public int getAsientosDisponibles() {
+    public int getCountAsientosDisponibles() {
         if (eventoSeleccionado != null) {
             try {
                 return asientoDAO.countDisponiblesByEvento(eventoSeleccionado.getId());
@@ -139,6 +171,10 @@ public class CompraBoletosBean implements Serializable {
     }
 
     public List<Asiento> getAsientosDisponiblesLista() {
+        return asientosDisponibles;
+    }
+
+    public List<Asiento> getAsientosDisponibles() {
         return asientosDisponibles;
     }
 

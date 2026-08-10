@@ -28,31 +28,31 @@ public class LoginBean implements Serializable {
     public String login() {
         try {
             usuarioActual = authService.login(correo, contrasena);
-            
+
             if (usuarioActual != null) {
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("usuarioActual", usuarioActual);
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("usuarioId", usuarioActual.getId());
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("roleId", usuarioActual.getRoleId());
-                
+
                 correo = "";
                 contrasena = "";
-                return "redirect:dashboard.xhtml";
+                return "dashboard.xhtml?faces-redirect=true";
             } else {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Correo o contraseña incorrectos"));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Correo o contraseña incorrectos"));
                 return null;
             }
         } catch (SQLException e) {
             e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error en la autenticación"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error en la autenticación"));
             return null;
         }
     }
 
     public String logout() {
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-        return "redirect:login.xhtml";
+        return "/login.xhtml?faces-redirect=true";
     }
 
     public boolean isLogueado() {

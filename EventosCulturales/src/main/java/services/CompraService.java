@@ -28,9 +28,8 @@ public class CompraService {
             return false;
         }
 
+        List<Asiento> asientosDisp = asientoDAO.findDisponiblesByEvento(eventoId);
         for (String numeroAsiento : asientos) {
-            asientoDAO.updateEstado(eventoId, numeroAsiento, "disponible");
-            List<Asiento> asientosDisp = asientoDAO.findDisponiblesByEvento(eventoId);
             boolean encontrado = false;
             for (Asiento a : asientosDisp) {
                 if (a.getNumeroAsiento().equals(numeroAsiento)) {
@@ -53,7 +52,7 @@ public class CompraService {
             }
 
             Evento evento = eventoDAO.read(eventoId);
-            double totalPagado = evento.getPrecioBoieto() * asientos.size();
+            double totalPagado = evento.getPrecioBoleto() * asientos.size();
 
             // Crear boletos
             for (String numeroAsiento : asientos) {

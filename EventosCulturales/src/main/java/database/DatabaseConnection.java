@@ -55,71 +55,14 @@ public class DatabaseConnection {
                     "FOREIGN KEY (roleId) REFERENCES roles(id)" +
                     ")");
 
-            // Tabla Eventos
-            stmt.execute("CREATE TABLE IF NOT EXISTS eventos (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "titulo TEXT NOT NULL," +
-                    "categoria TEXT NOT NULL," +
-                    "fecha_hora TIMESTAMP NOT NULL," +
-                    "duracion INTEGER NOT NULL," +
-                    "descripcion TEXT," +
-                    "precio_boleto REAL NOT NULL," +
-                    "aforo_maximo INTEGER NOT NULL," +
-                    "ubicacion TEXT NOT NULL," +
-                    "estado TEXT DEFAULT 'activo'," +
-                    "fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-                    ")");
-
-            // Tabla Asientos_Aforos
-            stmt.execute("CREATE TABLE IF NOT EXISTS asientos_aforos (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "evento_id INTEGER NOT NULL," +
-                    "numero_asiento TEXT NOT NULL," +
-                    "estado TEXT DEFAULT 'disponible'," +
-                    "FOREIGN KEY (evento_id) REFERENCES eventos(id)," +
-                    "UNIQUE(evento_id, numero_asiento)" +
-                    ")");
-
-            // Tabla Boletos
-            stmt.execute("CREATE TABLE IF NOT EXISTS boletos (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "evento_id INTEGER NOT NULL," +
-                    "usuario_id INTEGER NOT NULL," +
-                    "numero_asiento TEXT NOT NULL," +
-                    "estado TEXT DEFAULT 'activo'," +
-                    "fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                    "codigo_boleto TEXT UNIQUE," +
-                    "FOREIGN KEY (evento_id) REFERENCES eventos(id)," +
-                    "FOREIGN KEY (usuario_id) REFERENCES usuarios(id)" +
-                    ")");
-
-            // Tabla Reservas
-            stmt.execute("CREATE TABLE IF NOT EXISTS reservas (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "evento_id INTEGER NOT NULL," +
-                    "usuario_id INTEGER NOT NULL," +
-                    "fecha_reserva TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                    "estado TEXT DEFAULT 'activa'," +
-                    "cantidad_boletos INTEGER NOT NULL," +
-                    "total_pagado REAL NOT NULL," +
-                    "FOREIGN KEY (evento_id) REFERENCES eventos(id)," +
-                    "FOREIGN KEY (usuario_id) REFERENCES usuarios(id)" +
-                    ")");
-
-            // Crear índices para mejor rendimiento
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_usuarios_correo ON usuarios(correo)");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_eventos_categoria ON eventos(categoria)");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_boletos_usuario ON boletos(usuario_id)");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_boletos_evento ON boletos(evento_id)");
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_reservas_usuario ON reservas(usuario_id)");
-
-            // --- INSERCIÓN AUTOMÁTICA DE DATOS INICIALES ---
+            // Insertar roles base
             stmt.execute("INSERT OR IGNORE INTO roles (id, nombre) VALUES (1, 'Administrador')");
             stmt.execute("INSERT OR IGNORE INTO roles (id, nombre) VALUES (2, 'Organizador')");
             stmt.execute("INSERT OR IGNORE INTO roles (id, nombre) VALUES (3, 'Cliente')");
 
-            stmt.execute("INSERT OR IGNORE INTO usuarios (id, nombre, correo, contrasena_hash, roleId) " +
-                    "VALUES (1, 'Admin Sistema', 'admin@eventos.hn', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 1)");
+            // Insertar usuario Admin con el hash BCrypt correcto y asegurando actualización
+            stmt.execute("INSERT OR REPLACE INTO usuarios (id, nombre, correo, contrasena_hash, roleId) " +
+                    "VALUES (1, 'Admin Sistema', 'admin@eventos.hn', '$2a$10$TMrAOtZ7V8esQNynIrwQt.DFp0z7NMOj/4Q7iITKgXl8nYSTwVZiu', 1)");
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -78,7 +78,7 @@ public class EventService {
         if (evento.getDuracion() <= 0) {
             return false;
         }
-        if (evento.getPrecioBoieto() < 0) {
+        if (evento.getPrecioBoleto() < 0) {
             return false;
         }
         if (evento.getAforoMaximo() <= 0) {

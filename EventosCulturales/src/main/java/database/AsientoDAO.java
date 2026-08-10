@@ -28,7 +28,9 @@ public class AsientoDAO {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return new Asiento(rs.getInt("evento_id"), rs.getString("numero_asiento"), rs.getString("estado"));
+                Asiento asiento = new Asiento(rs.getInt("evento_id"), rs.getString("numero_asiento"), rs.getString("estado"));
+                asiento.setId(rs.getInt("id"));
+                return asiento;
             }
         }
         return null;
@@ -79,6 +81,13 @@ public class AsientoDAO {
                 asientos.add(asiento);
             }
         }
+
+        // Si no existen asientos creados para este evento, los generamos automáticamente basados en su aforo
+        if (asientos.isEmpty()) {
+            generarAsientosFaltantesParaEvento(eventoId);
+            asientos = findByEvento(eventoId); // Volver a consultar ya creados
+        }
+
         return asientos;
     }
 
@@ -94,6 +103,20 @@ public class AsientoDAO {
                 asientos.add(asiento);
             }
         }
+
+        // Si la lista está vacía, aseguramos verificar la generación automática
+        if (asientos.isEmpty()) {
+            List<Asiento> totalAsientos = findByEvento(eventoId); // Esto los crea si no existen
+            if (!totalAsientos.isEmpty()) {
+                // Filtramos de nuevo los disponibles
+                for (Asiento a : totalAsientos) {
+                    if ("disponible".equalsIgnoreCase(a.getEstado())) {
+                        asientos.add(a);
+                    }
+                }
+            }
+        }
+
         return asientos;
     }
 
@@ -103,7 +126,13 @@ public class AsientoDAO {
             pstmt.setInt(1, eventoId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1);
+                int count = rs.getInt(1);
+                if (count == 0) {
+                    // Forzar verificación y creación si es 0
+                    List<Asiento> disponibles = findDisponiblesByEvento(eventoId);
+                    return disponibles.size();
+                }
+                return count;
             }
         }
         return 0;
@@ -116,6 +145,34 @@ public class AsientoDAO {
             pstmt.setInt(2, eventoId);
             pstmt.setString(3, numeroAsiento);
             pstmt.executeUpdate();
+        }
+    }
+
+    private void generarAsientosFaltantesParaEvento(int eventoId) {
+        try (Connection conn = dbConnection.getConnection()) {
+            String sqlEvento = "SELECT aforo_maximo FROM eventos WHERE id = ?";
+            int aforo = 0;
+            try (PreparedStatement stmtEv = conn.prepareStatement(sqlEvento)) {
+                stmtEv.setInt(1, eventoId);
+                try (ResultSet rsEv = stmtEv.executeQuery()) {
+                    if (rsEv.next()) {
+                        aforo = rsEv.getInt("aforo_maximo");
+                    }
+                }
+            }
+
+            if (aforo > 0) {
+                String sqlInsert = "INSERT INTO asientos_aforos (evento_id, numero_asiento, estado) VALUES (?, ?, 'disponible')";
+                for (int i = 1; i <= aforo; i++) {
+                    try (PreparedStatement stmtIns = conn.prepareStatement(sqlInsert)) {
+                        stmtIns.setInt(1, eventoId);
+                        stmtIns.setString(2, "A" + i);
+                        stmtIns.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

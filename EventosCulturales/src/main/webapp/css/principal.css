@@ -1,6 +1,6 @@
 /* ========================================
    SISTEMA DE EVENTOS CULTURALES
-   Estilos Principales
+   Layout con Barra Lateral (Sidebar) & Tonos Tierra
    ======================================== */
 
 * {
@@ -11,9 +11,101 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #333;
+    background: #fcfbfa;
+    color: #2d2320;
     line-height: 1.6;
+}
+
+/* ========================================
+   LAYOUT GENERAL CON SIDEBAR (Menú Lateral)
+   ======================================== */
+
+/* Contenedor principal que organiza el menú a la izquierda y el contenido a la derecha */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Barra Lateral (Sidebar) en lugar de barra superior */
+.navbar.ui-menubar,
+aside.sidebar,
+.ui-menubar {
+    width: 260px !important;
+    background: #4a2c22 !important; /* Marrón tierra profundo */
+    border: none !important;
+    border-right: 1px solid #ebdcd5 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px 10px !important;
+    position: fixed !important;
+    height: 100vh !important;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 4px 0 10px rgba(45, 35, 32, 0.05);
+    border-radius: 0 !important;
+}
+
+/* Ajuste de la lista de opciones del menú para que vayan hacia abajo */
+.navbar .ui-menubar-root-list,
+.ui-menubar .ui-menu-list {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+.navbar .ui-menuitem,
+.ui-menubar .ui-menuitem {
+    width: 100% !important;
+    margin: 4px 0 !important;
+}
+
+/* Enlaces del menú lateral bien espaciados y con texto visible */
+.navbar .ui-menuitem-link,
+.ui-menubar .ui-menuitem-link {
+    color: #f7ede8 !important;
+    padding: 12px 18px !important;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1em;
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.navbar .ui-menuitem-link:hover,
+.ui-menubar .ui-menuitem-link:hover {
+    background: #9c4732 !important; /* Acento terracota al pasar el mouse */
+    color: #ffffff !important;
+}
+
+/* Submenús flotantes laterales limpios */
+.ui-menu.ui-menu-child {
+    background: #ffffff !important;
+    border: 1px solid #ebdcd5 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 15px -3px rgba(45, 35, 32, 0.15) !important;
+    padding: 5px !important;
+}
+
+.ui-menu.ui-menu-child .ui-menuitem-link {
+    color: #2d2320 !important;
+    padding: 10px 15px !important;
+}
+
+.ui-menu.ui-menu-child .ui-menuitem-link:hover {
+    background: #f7ede8 !important;
+    color: #9c4732 !important;
+}
+
+/* Contenido de la página desplazado a la derecha para dar espacio a la barra lateral */
+.main-container {
+    margin-left: 260px; /* Deja espacio exacto para la barra lateral */
+    background: #fcfbfa;
+    min-height: 100vh;
+    padding: 40px;
+    width: calc(100% - 260px);
 }
 
 /* ========================================
@@ -26,27 +118,19 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    background: linear-gradient(135deg, #4a2c22 0%, #2d1812 100%);
+    margin-left: 0 !important;
+    width: 100% !important;
 }
 
 .login-box {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(45, 35, 32, 0.15);
     width: 100%;
     max-width: 450px;
     padding: 40px;
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    border: 1px solid #ebdcd5;
 }
 
 .login-header {
@@ -55,14 +139,15 @@ body {
 }
 
 .login-header h1 {
-    color: #667eea;
-    font-size: 2.5em;
+    color: #9c4732;
+    font-size: 2.2em;
+    font-weight: 700;
     margin-bottom: 10px;
 }
 
 .login-header p {
-    color: #666;
-    font-size: 1.1em;
+    color: #78645d;
+    font-size: 1.05em;
 }
 
 .form-group {
@@ -72,163 +157,104 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
+    color: #4a3b35;
+    font-weight: 600;
 }
 
 .form-control {
     width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid #d9c4bc;
+    border-radius: 10px;
     font-size: 1em;
-    transition: border-color 0.3s;
+    color: #2d2320;
+    background: #fffaf8;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #9c4732;
+    box-shadow: 0 0 0 4px rgba(156, 71, 50, 0.15);
+    background: #ffffff;
 }
 
 .btn-login {
     width: 100%;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 14px 20px;
+    background: #9c4732;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 1.1em;
     font-weight: 600;
     cursor: pointer;
     margin: 20px 0;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: background 0.3s;
 }
 
 .btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    background: #7a3524;
 }
 
 .demo-credentials {
-    background: #f5f5f5;
+    background: #f7ede8;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-top: 20px;
-    border-left: 4px solid #667eea;
+    border: 1px solid #ebdcd5;
 }
 
 .demo-credentials p {
     margin: 5px 0;
     font-size: 0.9em;
-    color: #555;
+    color: #63524b;
 }
 
 .demo-credentials strong {
-    color: #667eea;
+    color: #9c4732;
 }
 
 /* ========================================
-   NAVBAR
+   CABECERAS Y TARJETAS
    ======================================== */
 
-.navbar {
-    background: linear-gradient(90deg, #2c3e50 0%, #3498db 100%);
-    border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.navbar .ui-menubar-root-list > .ui-menuitem > a {
-    color: white;
-    padding: 15px 20px;
-    transition: background 0.3s;
-}
-
-.navbar .ui-menubar-root-list > .ui-menuitem > a:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* ========================================
-   MAIN CONTAINER
-   ======================================== */
-
-.main-container {
-    background: #f8f9fa;
-    min-height: calc(100vh - 60px);
-    padding: 40px 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.page-header {
+.page-header, .dashboard-header {
     background: white;
-    padding: 30px;
-    border-radius: 10px;
+    padding: 30px 35px;
+    border-radius: 14px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    box-shadow: 0 1px 3px 0 rgba(45, 35, 32, 0.04);
+    border: 1px solid #ebdcd5;
 }
 
-.page-header h1 {
-    color: #2c3e50;
-    font-size: 2em;
+.page-header h1, .dashboard-header h1 {
+    color: #2d2320;
+    font-size: 1.8em;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+}
+
+.page-header p, .subtitle {
+    color: #78645d;
     margin: 0;
+    font-size: 1.05em;
 }
-
-.page-header p {
-    color: #7f8c8d;
-    margin: 5px 0 0 0;
-}
-
-/* ========================================
-   DASHBOARD HEADER
-   ======================================== */
-
-.dashboard-header {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.dashboard-header h1 {
-    color: #2c3e50;
-    font-size: 2.2em;
-    margin-bottom: 10px;
-}
-
-.subtitle {
-    color: #7f8c8d;
-    font-size: 1.1em;
-}
-
-/* ========================================
-   STATS GRID
-   ======================================== */
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
     margin-bottom: 30px;
 }
 
 .stat-card {
     background: white;
     padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px 0 rgba(45, 35, 32, 0.04);
     position: relative;
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ebdcd5;
 }
 
 .stat-card::before {
@@ -238,341 +264,160 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-}
-
-.stat-icon {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    font-size: 2.5em;
-    opacity: 0.2;
+    background: #9c4732;
 }
 
 .stat-number {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #667eea;
-    margin-bottom: 10px;
+    font-size: 2.4em;
+    font-weight: 700;
+    color: #2d2320;
+    margin-bottom: 5px;
 }
 
 .stat-label {
-    color: #7f8c8d;
-    font-size: 0.95em;
+    color: #78645d;
+    font-size: 0.9em;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-weight: 600;
 }
 
 /* ========================================
-   EVENTOS SECTION
+   SECCIONES Y TABLAS (CONTRASTE PERFECTO)
    ======================================== */
 
 .eventos-section {
     background: white;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px 0 rgba(45, 35, 32, 0.04);
+    border: 1px solid #ebdcd5;
 }
 
 .eventos-section h2 {
-    color: #2c3e50;
+    color: #2d2320;
     margin-bottom: 20px;
-    font-size: 1.8em;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.ui-datatable {
+    border: 1px solid #ebdcd5 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+}
+
+.ui-datatable .ui-datatable-header {
+    background: #f7ede8 !important;
+    border-bottom: 1px solid #ebdcd5 !important;
+    padding: 15px !important;
+}
+
+.ui-datatable th.ui-state-default {
+    background: #f4ece8 !important;
+    color: #2d2320 !important;
+    padding: 14px 16px !important;
+    border-color: #ebdcd5 !important;
+    font-weight: 700 !important;
+}
+
+/* Forzar que las letras de las celdas sean oscuras, visibles y legibles */
+.ui-datatable td.ui-datatable-data,
+.ui-datatable .ui-datatable-data td,
+.ui-datatable tr.ui-widget-content td {
+    padding: 14px 16px !important;
+    color: #2d2320 !important;
+    background: #ffffff !important;
+    border-color: #f4ece8 !important;
+    font-weight: 500 !important;
+}
+
+.ui-datatable tr.ui-widget-content:hover td {
+    background: #f7ede8 !important;
 }
 
 /* ========================================
-   TABLES
+   BOTONES
    ======================================== */
 
-.eventos-table {
-    width: 100%;
-    border-collapse: collapse;
+.ui-button.ui-widget {
+    border-radius: 8px !important;
+    padding: 10px 18px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-.eventos-table thead {
-    background: #f5f5f5;
+.btn-primary, .ui-button.ui-state-default {
+    background: #9c4732 !important;
+    color: white !important;
+}
+.btn-primary:hover, .ui-button.ui-state-default:hover {
+    background: #7a3524 !important;
 }
 
-.eventos-table th {
-    padding: 15px;
-    text-align: left;
-    color: #2c3e50;
-    font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
+.btn-success, .ui-button-success {
+    background: #5d6e53 !important;
+    color: white !important;
+}
+.btn-success:hover, .ui-button-success:hover {
+    background: #47543f !important;
 }
 
-.eventos-table td {
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+.btn-warning, .ui-button-warning {
+    background: #b87333 !important;
+    color: white !important;
+}
+.btn-warning:hover, .ui-button-warning:hover {
+    background: #965b26 !important;
 }
 
-.eventos-table tbody tr:hover {
-    background: #f9f9f9;
+.btn-danger, .ui-button-danger {
+    background: #6b3022 !important;
+    color: white !important;
 }
-
-/* ========================================
-   BUTTONS
-   ======================================== */
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-}
-
-.btn-secondary {
-    background: #95a5a6;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-}
-
-.btn-secondary:hover {
-    background: #7f8c8d;
-}
-
-.btn-danger {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-}
-
-.btn-danger:hover {
-    background: #c0392b;
+.btn-danger:hover, .ui-button-danger:hover {
+    background: #4d2117 !important;
 }
 
 /* ========================================
-   FORMS
+   PANELES Y FORMULARIOS
    ======================================== */
 
 .form-panel {
     background: white;
-    padding: 25px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.form-grid {
-    width: 100%;
-}
-
-.form-grid .ui-panelgrid-cell {
-    padding: 12px;
-}
-
-.w-100 {
-    width: 100%;
-}
-
-/* ========================================
-   CHARTS
-   ======================================== */
-
-.chart-panel {
-    background: white;
     padding: 30px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 14px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px 0 rgba(45, 35, 32, 0.04);
+    border: 1px solid #ebdcd5;
 }
 
-.chart-panel h2 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-size: 1.5em;
+.ui-panel .ui-panel-titlebar {
+    background: #f7ede8 !important;
+    color: #2d2320 !important;
+    border-bottom: 1px solid #ebdcd5 !important;
+    padding: 15px 20px !important;
+    font-weight: 700 !important;
+    border-radius: 14px 14px 0 0 !important;
 }
 
-/* ========================================
-   DIALOGS & MESSAGES
-   ======================================== */
-
-.ui-dialog {
-    border-radius: 10px !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+.ui-panel .ui-panel-content {
+    background: #ffffff !important;
+    padding: 20px !important;
+    border: none !important;
 }
 
-.ui-dialog .ui-dialog-titlebar {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 10px 10px 0 0;
-    padding: 15px 20px;
-}
-
-.ui-message {
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-/* ========================================
-   PRIMEFACES COMPONENTS
-   ======================================== */
-
-.ui-button {
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 600;
-}
-
-.ui-inputtext, .ui-inputtextarea, .ui-password {
-    border-radius: 8px;
-    border: 2px solid #e0e0e0;
-    padding: 10px 15px;
+.ui-inputtext, .ui-inputtextarea, .ui-password, .ui-selectonemenu {
+    border-radius: 8px !important;
+    border: 2px solid #d9c4bc !important;
+    padding: 10px 14px !important;
+    color: #2d2320 !important;
+    background: #fffaf8 !important;
 }
 
 .ui-inputtext:focus, .ui-inputtextarea:focus, .ui-password:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.ui-selectonemenu {
-    border-radius: 8px;
-    border: 2px solid #e0e0e0;
-}
-
-.ui-calendar {
-    border-radius: 8px;
-}
-
-.ui-tag {
-    border-radius: 20px;
-    padding: 5px 15px;
-    font-weight: 600;
-}
-
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
-
-@media (max-width: 768px) {
-    .login-box {
-        padding: 25px;
-    }
-
-    .page-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .page-header h1 {
-        font-size: 1.5em;
-    }
-
-    .dashboard-header h1 {
-        font-size: 1.8em;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .eventos-section {
-        padding: 15px;
-    }
-
-    .main-container {
-        padding: 20px 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .login-header h1 {
-        font-size: 2em;
-    }
-
-    .form-group label {
-        font-size: 0.9em;
-    }
-
-    .eventos-table {
-        font-size: 0.9em;
-    }
-
-    .eventos-table th,
-    .eventos-table td {
-        padding: 10px 5px;
-    }
-}
-
-/* ========================================
-   ANIMATIONS
-   ======================================== */
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in {
-    animation: fadeIn 0.3s ease-out;
-}
-
-.slide-up {
-    animation: slideUp 0.3s ease-out;
-}
-
-/* ========================================
-   UTILITY CLASSES
-   ======================================== */
-
-.text-center {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
-}
-
-.total-label {
-    font-weight: 700;
-    color: #2c3e50;
-    font-size: 1.2em;
-}
-
-.total-value {
-    font-weight: 700;
-    color: #667eea;
-    font-size: 1.5em;
+    border-color: #9c4732 !important;
+    box-shadow: 0 0 0 3px rgba(156, 71, 50, 0.15) !important;
+    background: #ffffff !important;
 }

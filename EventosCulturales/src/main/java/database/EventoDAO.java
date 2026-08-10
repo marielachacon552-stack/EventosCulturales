@@ -1,8 +1,10 @@
 package database;
 
 import data.Evento;
+import data.Asiento;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,17 +16,47 @@ public class EventoDAO {
     }
 
     public void create(Evento evento) throws SQLException {
-        String sql = "INSERT INTO eventos (titulo, categoria, fecha_hora, duracion, descripcion, precio_boleto, aforo_maximo, ubicacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
+        String sql = "INSERT INTO eventos (titulo, categoria, fecha_hora, duracion, descripcion, precio_boleto, aforo_maximo, ubicacion, estado, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'activo', datetime('now'))";
+        int eventoId = -1;
+
+        try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, evento.getTitulo());
             pstmt.setString(2, evento.getCategoria());
-            pstmt.setTimestamp(3, Timestamp.valueOf(evento.getFechaHora()));
+            pstmt.setString(3, evento.getFechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             pstmt.setInt(4, evento.getDuracion());
             pstmt.setString(5, evento.getDescripcion());
-            pstmt.setDouble(6, evento.getPrecioBoieto());
+            pstmt.setDouble(6, evento.getPrecioBoleto());
             pstmt.setInt(7, evento.getAforoMaximo());
             pstmt.setString(8, evento.getUbicacion());
             pstmt.executeUpdate();
+
+            // Obtener el ID generado para crear sus asientos automáticamente
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    eventoId = generatedKeys.getInt(1);
+                }
+            }
+        }
+
+        // Generar automáticamente los asientos según el aforo máximo usando la tabla correcta (asientos_aforos)
+        if (eventoId != -1 && evento.getAforoMaximo() > 0) {
+            generarAsientosParaEvento(eventoId, evento.getAforoMaximo());
+        }
+    }
+
+    private void generarAsientosParaEvento(int eventoId, int aforo) {
+        // MODIFICADO: Apunta a asientos_aforos en lugar de asientos
+        String sqlAsiento = "INSERT INTO asientos_aforos (evento_id, numero_asiento, estado) VALUES (?, ?, 'disponible')";
+        try (Connection conn = dbConnection.getConnection()) {
+            for (int i = 1; i <= aforo; i++) {
+                try (PreparedStatement pstmt = conn.prepareStatement(sqlAsiento)) {
+                    pstmt.setInt(1, eventoId);
+                    pstmt.setString(2, "A" + i);
+                    pstmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -57,10 +89,10 @@ public class EventoDAO {
         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
             pstmt.setString(1, evento.getTitulo());
             pstmt.setString(2, evento.getCategoria());
-            pstmt.setTimestamp(3, Timestamp.valueOf(evento.getFechaHora()));
+            pstmt.setString(3, evento.getFechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             pstmt.setInt(4, evento.getDuracion());
             pstmt.setString(5, evento.getDescripcion());
-            pstmt.setDouble(6, evento.getPrecioBoieto());
+            pstmt.setDouble(6, evento.getPrecioBoleto());
             pstmt.setInt(7, evento.getAforoMaximo());
             pstmt.setString(8, evento.getUbicacion());
             pstmt.setString(9, evento.getEstado());
@@ -107,16 +139,41 @@ public class EventoDAO {
         evento.setId(rs.getInt("id"));
         evento.setTitulo(rs.getString("titulo"));
         evento.setCategoria(rs.getString("categoria"));
-        evento.setFechaHora(rs.getTimestamp("fecha_hora").toLocalDateTime());
+
+        String fechaStr = rs.getString("fecha_hora");
+        if (fechaStr != null && !fechaStr.isEmpty()) {
+            if (fechaStr.contains("T")) {
+                evento.setFechaHora(LocalDateTime.parse(fechaStr));
+            } else if (fechaStr.contains(" ")) {
+                evento.setFechaHora(LocalDateTime.parse(fechaStr.replace(" ", "T")));
+            } else {
+                try {
+                    long millis = Long.parseLong(fechaStr);
+                    evento.setFechaHora(LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(millis), java.time.ZoneId.systemDefault()));
+                } catch (NumberFormatException e) {
+                    evento.setFechaHora(LocalDateTime.now());
+                }
+            }
+        }
+
         evento.setDuracion(rs.getInt("duracion"));
         evento.setDescripcion(rs.getString("descripcion"));
-        evento.setPrecioBoieto(rs.getDouble("precio_boleto"));
+        evento.setPrecioBoleto(rs.getDouble("precio_boleto"));
         evento.setAforoMaximo(rs.getInt("aforo_maximo"));
         evento.setUbicacion(rs.getString("ubicacion"));
         evento.setEstado(rs.getString("estado"));
-        if (rs.getTimestamp("fecha_creacion") != null) {
-            evento.setFechaCreacion(rs.getTimestamp("fecha_creacion").toLocalDateTime());
+
+        String fechaCreacionStr = rs.getString("fecha_creacion");
+        if (fechaCreacionStr != null && !fechaCreacionStr.isEmpty()) {
+            if (fechaCreacionStr.contains("T")) {
+                evento.setFechaCreacion(LocalDateTime.parse(fechaCreacionStr));
+            } else if (fechaCreacionStr.contains("@@")) { // fallback
+                evento.setFechaCreacion(LocalDateTime.now());
+            } else if (fechaCreacionStr.contains(" ")) {
+                evento.setFechaCreacion(LocalDateTime.parse(fechaCreacionStr.replace(" ", "T")));
+            }
         }
+
         return evento;
     }
 }

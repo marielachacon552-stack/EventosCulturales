@@ -8,7 +8,6 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Named(value = "eventoCrudBean")
@@ -17,12 +16,10 @@ public class EventoCrudBean implements Serializable {
     private EventService eventService;
     private List<Evento> eventos;
     private Evento eventoSeleccionado;
-    private Evento eventoNuevo;
     private boolean mostrarDialogo;
 
     public EventoCrudBean() {
         this.eventService = new EventService();
-        this.eventoNuevo = new Evento();
         cargarEventos();
     }
 
@@ -32,60 +29,52 @@ public class EventoCrudBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al cargar eventos"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al cargar eventos"));
         }
     }
 
     public void abrirDialogoNuevo() {
-        eventoNuevo = new Evento();
-        mostrarDialogo = true;
+        // Inicializamos un objeto completamente nuevo con ID 0 para creación
+        this.eventoSeleccionado = new Evento();
+        this.mostrarDialogo = true;
     }
 
     public void abrirDialogoEditar() {
-        if (eventoSeleccionado != null) {
-            eventoNuevo = new Evento();
-            eventoNuevo.setId(eventoSeleccionado.getId());
-            eventoNuevo.setTitulo(eventoSeleccionado.getTitulo());
-            eventoNuevo.setCategoria(eventoSeleccionado.getCategoria());
-            eventoNuevo.setFechaHora(eventoSeleccionado.getFechaHora());
-            eventoNuevo.setDuracion(eventoSeleccionado.getDuracion());
-            eventoNuevo.setDescripcion(eventoSeleccionado.getDescripcion());
-            eventoNuevo.setPrecioBoieto(eventoSeleccionado.getPrecioBoieto());
-            eventoNuevo.setAforoMaximo(eventoSeleccionado.getAforoMaximo());
-            eventoNuevo.setUbicacion(eventoSeleccionado.getUbicacion());
-            mostrarDialogo = true;
+        // Si ya viene seleccionado de la tabla, se queda listo para editar
+        if (this.eventoSeleccionado != null) {
+            this.mostrarDialogo = true;
         }
     }
 
     public void guardar() {
-        if (!eventService.validarEvento(eventoNuevo)) {
+        if (!eventService.validarEvento(eventoSeleccionado)) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Por favor complete todos los campos correctamente"));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Por favor complete todos los campos correctamente"));
             return;
         }
 
         try {
-            if (eventoNuevo.getId() == 0) {
+            if (eventoSeleccionado.getId() == 0) {
                 // Crear nuevo
-                if (eventService.crearEvento(eventoNuevo)) {
+                if (eventService.crearEvento(eventoSeleccionado)) {
                     FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento creado correctamente"));
-                    mostrarDialogo = false;
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento creado correctamente"));
+                    this.mostrarDialogo = false;
                     cargarEventos();
                 }
             } else {
                 // Actualizar
-                if (eventService.actualizarEvento(eventoNuevo)) {
+                if (eventService.actualizarEvento(eventoSeleccionado)) {
                     FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento actualizado correctamente"));
-                    mostrarDialogo = false;
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento actualizado correctamente"));
+                    this.mostrarDialogo = false;
                     cargarEventos();
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al guardar evento"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al guardar evento"));
         }
     }
 
@@ -94,21 +83,21 @@ public class EventoCrudBean implements Serializable {
             try {
                 if (eventService.eliminarEvento(eventoSeleccionado.getId())) {
                     FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento eliminado correctamente"));
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento eliminado correctamente"));
                     cargarEventos();
                     eventoSeleccionado = null;
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar evento"));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar evento"));
             }
         }
     }
 
     public void cancelar() {
-        mostrarDialogo = false;
-        eventoNuevo = new Evento();
+        this.mostrarDialogo = false;
+        this.eventoSeleccionado = new Evento();
     }
 
     // Getters y Setters
@@ -126,14 +115,6 @@ public class EventoCrudBean implements Serializable {
 
     public void setEventoSeleccionado(Evento eventoSeleccionado) {
         this.eventoSeleccionado = eventoSeleccionado;
-    }
-
-    public Evento getEventoNuevo() {
-        return eventoNuevo;
-    }
-
-    public void setEventoNuevo(Evento eventoNuevo) {
-        this.eventoNuevo = eventoNuevo;
     }
 
     public boolean isMostrarDialogo() {

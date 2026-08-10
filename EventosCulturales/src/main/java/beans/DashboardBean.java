@@ -21,6 +21,7 @@ public class DashboardBean implements Serializable {
     private ReservaDAO reservaDAO;
     private AsientoDAO asientoDAO;
     private List<Evento> eventosProximos;
+    private Evento eventoDetalles;
     private int totalBoletosVendidos;
     private double totalIngresos;
 
@@ -46,6 +47,10 @@ public class DashboardBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void verDetalles(Evento evento) {
+        this.eventoDetalles = evento;
     }
 
     public Usuario getUsuarioActual() {
@@ -75,6 +80,14 @@ public class DashboardBean implements Serializable {
 
     public void setEventosProximos(List<Evento> eventosProximos) {
         this.eventosProximos = eventosProximos;
+    }
+
+    public Evento getEventoDetalles() {
+        return eventoDetalles;
+    }
+
+    public void setEventoDetalles(Evento eventoDetalles) {
+        this.eventoDetalles = eventoDetalles;
     }
 
     public int getTotalBoletosVendidos() {

@@ -20,7 +20,7 @@ public class UsuariosBean implements Serializable {
     private UsuarioDAO usuarioDAO;
     private RoleDAO roleDAO;
     private AuthenticationService authService;
-    
+
     private List<Usuario> usuarios;
     private List<Role> roles;
     private Usuario usuarioSeleccionado;
@@ -46,62 +46,66 @@ public class UsuariosBean implements Serializable {
     }
 
     public void abrirDialogoNuevo() {
-        usuarioNuevo = new Usuario();
+        usuarioNuevo = new Usuario(); // ID por defecto será 0 o null (nuevo registro)
         contrasenaNueva = "";
         mostrarDialogo = true;
     }
 
     public void abrirDialogoEditar() {
         if (usuarioSeleccionado != null) {
-            usuarioNuevo = new Usuario();
-            usuarioNuevo.setId(usuarioSeleccionado.getId());
-            usuarioNuevo.setNombre(usuarioSeleccionado.getNombre());
-            usuarioNuevo.setCorreo(usuarioSeleccionado.getCorreo());
-            usuarioNuevo.setRoleId(usuarioSeleccionado.getRoleId());
-            contrasenaNueva = "";
+            this.usuarioNuevo = new Usuario();
+            this.usuarioNuevo.setId(usuarioSeleccionado.getId());
+            this.usuarioNuevo.setNombre(usuarioSeleccionado.getNombre());
+            this.usuarioNuevo.setCorreo(usuarioSeleccionado.getCorreo());
+            this.usuarioNuevo.setRoleId(usuarioSeleccionado.getRoleId());
+            this.contrasenaNueva = "";
             mostrarDialogo = true;
         }
     }
 
     public void guardar() {
         if (usuarioNuevo.getNombre() == null || usuarioNuevo.getNombre().trim().isEmpty() ||
-            usuarioNuevo.getCorreo() == null || usuarioNuevo.getCorreo().trim().isEmpty() ||
-            usuarioNuevo.getRoleId() == 0) {
+                usuarioNuevo.getCorreo() == null || usuarioNuevo.getCorreo().trim().isEmpty() ||
+                usuarioNuevo.getRoleId() == 0) {
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Por favor complete todos los campos"));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Por favor complete todos los campos"));
             return;
         }
 
         try {
+            // Verificamos si el ID es nulo o 0 para saber si es creación o actualización real
             if (usuarioNuevo.getId() == 0) {
                 // Crear nuevo
                 if (contrasenaNueva == null || contrasenaNueva.trim().isEmpty()) {
                     FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Ingrese una contraseña"));
+                            new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Ingrese una contraseña"));
                     return;
                 }
-                
+
                 if (authService.registrar(usuarioNuevo, contrasenaNueva)) {
                     FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario creado correctamente"));
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario creado correctamente"));
                     mostrarDialogo = false;
                     cargarDatos();
                 } else {
                     FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El correo ya existe"));
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El correo ya existe"));
                 }
             } else {
-                // Actualizar
+                // Actualizar usuario existente
                 usuarioDAO.update(usuarioNuevo);
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario actualizado correctamente"));
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario actualizado correctamente"));
                 mostrarDialogo = false;
                 cargarDatos();
             }
+            // Limpiamos la selección para evitar acoplamientos residuales
+            usuarioNuevo = new Usuario();
+            usuarioSeleccionado = null;
         } catch (SQLException e) {
             e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al guardar usuario"));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al guardar usuario"));
         }
     }
 
@@ -110,13 +114,13 @@ public class UsuariosBean implements Serializable {
             try {
                 usuarioDAO.delete(usuarioSeleccionado.getId());
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario eliminado correctamente"));
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario eliminado correctamente"));
                 cargarDatos();
                 usuarioSeleccionado = null;
             } catch (SQLException e) {
                 e.printStackTrace();
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar usuario"));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar usuario"));
             }
         }
     }
@@ -124,6 +128,7 @@ public class UsuariosBean implements Serializable {
     public void cancelar() {
         mostrarDialogo = false;
         usuarioNuevo = new Usuario();
+        usuarioSeleccionado = null;
     }
 
     // Getters y Setters

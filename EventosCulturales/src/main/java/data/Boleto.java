@@ -10,6 +10,7 @@ public class Boleto {
     private String estado;
     private LocalDateTime fechaCompra;
     private String codigoBoleto;
+    private String nombreEvento; // Nuevo campo agregado
 
     public Boleto() {}
 
@@ -74,6 +75,14 @@ public class Boleto {
 
     public void setCodigoBoleto(String codigoBoleto) {
         this.codigoBoleto = codigoBoleto;
+    }
+
+    public String getNombreEvento() {
+        return nombreEvento;
+    }
+
+    public void setNombreEvento(String nombreEvento) {
+        this.nombreEvento = nombreEvento;
     }
 
     @Override

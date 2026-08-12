@@ -14,20 +14,17 @@
 <h:body>
     <f:view>
         <div class="app-wrapper">
-            <!-- Barra Lateral / Menú Principal -->
             <h:form>
                 <p:menubar styleClass="navbar">
-                    <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
-                    <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+                    <p:menuitem value="Dashboard" url="dashboard.xhtml" />
                 </p:menubar>
             </h:form>
 
-            <!-- Contenedor Principal a la derecha de la barra lateral -->
             <div class="main-container">
                 <h:form id="formAdminEventos">
                     <div class="page-header">
-                        <h1>📅 Gestión de Eventos Culturales</h1>
-                        <p:commandButton value="✨ Crear Nuevo Evento"
+                        <h1>Gestión de Eventos Culturales</h1>
+                        <p:commandButton value="Crear Nuevo Evento"
                                          icon="pi pi-plus"
                                          action="#{eventoCrudBean.abrirDialogoNuevo()}"
                                          process="@this"
@@ -38,7 +35,6 @@
 
                     <p:messages id="mensajes" showDetail="true" closable="true" />
 
-                    <!-- Tabla de Eventos -->
                     <p:dataTable id="tblEventos"
                                  value="#{eventoCrudBean.eventos}"
                                  var="evento"
@@ -79,21 +75,21 @@
                                              icon="pi pi-pencil">
                                 <f:setPropertyActionListener value="#{evento}" target="#{eventoCrudBean.eventoSeleccionado}" />
                             </p:commandButton>
+
                             <p:commandButton value="Eliminar"
                                              action="#{eventoCrudBean.eliminar()}"
                                              process="tblEventos"
                                              update="tblEventos,mensajes"
                                              icon="pi pi-trash"
-                                             styleClass="btn-danger"
-                                             onclick="return confirm('¿Está seguro?');">
+                                             styleClass="btn-danger">
                                 <f:setPropertyActionListener value="#{evento}" target="#{eventoCrudBean.eventoSeleccionado}" />
+                                <p:confirm header="Confirmar Eliminación" message="¿Está seguro de que desea eliminar este evento?" icon="pi pi-exclamation-triangle"/>
                             </p:commandButton>
                         </p:column>
                     </p:dataTable>
 
-                    <!-- Diálogo para Crear/Editar Evento -->
-                    <p:dialog id="dlgEvento" header="Evento" widgetVar="dlgEvento" modal="true" width="600px" responsive="true">
-                        <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
+                    <p:dialog id="dlgEvento" header="Gestión de Evento" widgetVar="dlgEvento" modal="true" style="width: 750px !important;" responsive="true">
+                        <p:panelGrid columns="2" layout="grid" styleClass="form-grid" columnClasses="ui-grid-col-4, ui-grid-col-8">
 
                             <p:outputLabel value="Título:" />
                             <p:inputText value="#{eventoCrudBean.eventoSeleccionado.titulo}"
@@ -102,7 +98,7 @@
                                          styleClass="w-100"/>
 
                             <p:outputLabel value="Categoría:" />
-                            <p:selectOneMenu value="#{eventoCrudBean.eventoSeleccionado.categoria}" required="true">
+                            <p:selectOneMenu value="#{eventoCrudBean.eventoSeleccionado.categoria}" required="true" style="width: 100%;">
                                 <f:selectItem itemLabel="-- Selecciona --" itemValue=""/>
                                 <f:selectItem itemLabel="Teatro" itemValue="teatro"/>
                                 <f:selectItem itemLabel="Concierto" itemValue="concierto"/>
@@ -110,20 +106,17 @@
                             </p:selectOneMenu>
 
                             <p:outputLabel value="Fecha y Hora:" />
-                            <p:calendar value="#{eventoCrudBean.eventoSeleccionado.fechaHora}"
-                                        pattern="dd/MM/yyyy HH:mm"
-                                        showTime="true"
-                                        required="true"/>
+                            <p:datePicker value="#{eventoCrudBean.eventoSeleccionado.fechaHora}"
+                                          pattern="dd/MM/yyyy HH:mm"
+                                          showTime="true"
+                                          required="true"
+                                          mindate="#{eventoCrudBean.fechaActualMinima}"
+                                          styleClass="w-100"/>
 
                             <p:outputLabel value="Duración (minutos):" />
                             <p:inputNumber value="#{eventoCrudBean.eventoSeleccionado.duracion}"
                                            required="true"
                                            styleClass="w-100"/>
-
-                            <p:outputLabel value="Descripción:" />
-                            <p:inputTextarea value="#{eventoCrudBean.eventoSeleccionado.descripcion}"
-                                             rows="3"
-                                             styleClass="w-100"/>
 
                             <p:outputLabel value="Precio del Boleto:" />
                             <p:inputNumber value="#{eventoCrudBean.eventoSeleccionado.precioBoleto}"
@@ -140,6 +133,11 @@
                             <p:inputText value="#{eventoCrudBean.eventoSeleccionado.ubicacion}"
                                          required="true"
                                          styleClass="w-100"/>
+
+                            <p:outputLabel value="Descripción:" />
+                            <p:inputTextarea value="#{eventoCrudBean.eventoSeleccionado.descripcion}"
+                                             rows="3"
+                                             styleClass="w-100"/>
                         </p:panelGrid>
 
                         <f:facet name="footer">
@@ -157,6 +155,12 @@
                                              styleClass="btn-secondary"/>
                         </f:facet>
                     </p:dialog>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="450px">
+                        <p:commandButton value="Sí, eliminar" type="button" styleClass="ui-confirmdialog-yes btn-danger" icon="pi pi-check" />
+                        <p:commandButton value="Cancelar" type="button" styleClass="ui-confirmdialog-no btn-secondary" icon="pi pi-times" />
+                    </p:confirmDialog>
+
                 </h:form>
             </div>
         </div>

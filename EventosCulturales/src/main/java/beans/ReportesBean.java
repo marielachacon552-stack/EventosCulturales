@@ -3,8 +3,10 @@ package beans;
 import services.ReportService;
 import jakarta.inject.Named;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.annotation.PostConstruct;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Named(value = "reportesBean")
@@ -18,6 +20,12 @@ public class ReportesBean implements Serializable {
 
     public ReportesBean() {
         this.reportService = new ReportService();
+        this.asistenciaPorCategoria = new HashMap<>();
+        this.ventasPorCategoria = new HashMap<>();
+    }
+
+    @PostConstruct
+    public void init() {
         cargarDatos();
     }
 
@@ -25,24 +33,29 @@ public class ReportesBean implements Serializable {
         try {
             totalVentasGlobal = reportService.getTotalVentasGlobal();
             totalBoletosVendidos = reportService.getTotalBoletosVendidos();
-            asistenciaPorCategoria = reportService.getAsistenciaPorCategoria();
-            ventasPorCategoria = reportService.getVentasPorCategoria();
+
+            Map<String, Integer> asistencia = reportService.getAsistenciaPorCategoria();
+            if (asistencia != null) {
+                this.asistenciaPorCategoria = asistencia;
+            } else {
+                this.asistenciaPorCategoria.clear();
+            }
+
+            Map<String, Double> ventas = reportService.getVentasPorCategoria();
+            if (ventas != null) {
+                this.ventasPorCategoria = ventas;
+            } else {
+                this.ventasPorCategoria.clear();
+            }
+
         } catch (SQLException e) {
+            System.out.println("ERROR al cargar datos en ReportesBean: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void exportarPDF() {
-        // Implementar exportación a PDF con OpenPDF
-        System.out.println("Exportando a PDF...");
-    }
 
-    public void exportarExcel() {
-        // Implementar exportación a Excel con POI
-        System.out.println("Exportando a Excel...");
-    }
 
-    // Getters y Setters
     public double getTotalVentasGlobal() {
         return totalVentasGlobal;
     }

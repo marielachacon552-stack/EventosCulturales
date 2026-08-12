@@ -4,69 +4,283 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Eventos Culturales - Dashboard</title>
     <link rel="stylesheet" href="css/principal.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fcfbfa;
+            color: #2d2320;
+            font-size: 1.2rem;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .custom-sidebar {
+            width: 420px !important;
+            min-width: 420px !important;
+            max-width: 420px !important;
+            background-color: #4a2e2b;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 30px 18px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .custom-sidebar-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .main-container {
+            margin-left: 435px !important;
+            flex-grow: 1;
+            padding: 30px;
+            box-sizing: border-box;
+            background-color: #fcfbfa;
+            width: calc(100% - 435px);
+        }
+
+        .custom-sidebar .menu-link {
+            color: #ffffff !important;
+            text-decoration: none !important;
+            font-size: 1.35rem !important;
+            font-weight: 600;
+            padding: 16px 20px;
+            border-radius: 8px;
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+            border: none;
+            width: 100%;
+            text-align: left;
+            box-sizing: border-box;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .custom-sidebar .menu-link:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            border: 1px solid #ebdcd5;
+            box-shadow: 0 1px 3px rgba(45, 35, 32, 0.04);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.4rem !important;
+            color: #2d2320;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-header .subtitle {
+            font-size: 1.25rem !important;
+            color: #78645d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #ebdcd5;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(45, 35, 32, 0.04);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: #9c4732;
+        }
+
+        .stat-number {
+            font-size: 3rem !important;
+            font-weight: 700;
+            color: #2d2320;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #78645d;
+            font-size: 1.15rem !important;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #ebdcd5;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(45, 35, 32, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card h3 {
+            font-size: 1.5rem !important;
+            color: #2d2320;
+            margin-bottom: 15px;
+        }
+
+        .eventos-section {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            border: 1px solid #ebdcd5;
+            box-shadow: 0 1px 3px rgba(45, 35, 32, 0.04);
+        }
+
+        .eventos-section h2 {
+            font-size: 1.8rem !important;
+            color: #2d2320;
+            margin-bottom: 20px;
+        }
+
+        .ui-datatable th.ui-state-default {
+            background: #f4ece8 !important;
+            color: #2d2320 !important;
+            font-size: 1.25rem !important;
+            padding: 18px !important;
+            font-weight: 700 !important;
+        }
+
+        .ui-datatable tr.ui-widget-content td {
+            font-size: 1.2rem !important;
+            padding: 18px !important;
+            color: #2d2320 !important;
+            background: #ffffff !important;
+        }
+
+        .ui-tag {
+            font-size: 1.1rem !important;
+            padding: 6px 12px !important;
+        }
+
+        .ui-button.ui-widget {
+            font-size: 1.15rem !important;
+            padding: 12px 20px !important;
+            border-radius: 8px !important;
+            background: #9c4732 !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
+        .ui-button.ui-widget:hover {
+            background: #7a3524 !important;
+        }
+    </style>
 </h:head>
-<h:body>
+<h:body style="margin: 0; padding: 0;">
+    <f:metadata>
+        <f:viewAction action="#{dashboardBean.cargarDatos()}" />
+    </f:metadata>
+
     <f:view>
         <div class="app-wrapper">
-            <!-- Barra Lateral / Menú Principal -->
-            <h:form>
-                <p:menubar styleClass="navbar">
-                    <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
+            <div class="navbar custom-sidebar">
+                <h:form styleClass="custom-sidebar-form">
+                    <h:outputLink value="dashboard.xhtml" styleClass="menu-link">
+                        Dashboard
+                    </h:outputLink>
 
-                    <p:submenu label="📅 Gestión de Eventos" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
-                        <p:menuitem value="Administrar Eventos" url="eventos-admin.xhtml" />
-                    </p:submenu>
+                    <h:outputLink value="eventos-admin.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        Administrar Eventos
+                    </h:outputLink>
 
-                    <p:submenu label="🎫 Compra de Boletos" rendered="#{dashboardBean.esCliente()}">
-                        <p:menuitem value="Comprar Boletos" url="compra-boletos.xhtml" />
-                    </p:submenu>
+                    <h:outputLink value="compra-boletos.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esCliente()}">
+                        Comprar Boletos
+                    </h:outputLink>
 
-                    <p:submenu label="📊 Reportes" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
-                        <p:menuitem value="Ver Reportes" url="reportes.xhtml" />
-                    </p:submenu>
+                    <h:outputLink value="reportes.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        Ver Reportes
+                    </h:outputLink>
 
-                    <p:submenu label="👥 Administración" rendered="#{dashboardBean.esAdmin()}">
-                        <p:menuitem value="Gestionar Usuarios" url="usuarios-admin.xhtml" />
-                    </p:submenu>
+                    <h:outputLink value="usuarios-admin.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esAdmin()}">
+                        Gestionar Usuarios
+                    </h:outputLink>
 
-                    <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
-                </p:menubar>
-            </h:form>
+                    <h:commandLink value="Salir (#{dashboardBean.usuarioActual.nombre})"
+                                   action="#{loginBean.logout()}"
+                                   styleClass="menu-link"
+                                   style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 15px;" />
+                </h:form>
+            </div>
 
-            <!-- Contenedor Principal a la derecha de la barra lateral -->
             <div class="main-container">
                 <h:form id="formDashboard">
                     <div class="dashboard-header">
-                        <h1>🎭 Bienvenido, #{dashboardBean.usuarioActual.nombre}</h1>
+                        <h1> Bienvenido, #{dashboardBean.usuarioActual.nombre}</h1>
                         <p class="subtitle">Sistema de Reservas para Eventos Culturales</p>
                     </div>
 
-                    <!-- Resumen de Estadísticas (Admin y Organizador) -->
                     <p:outputPanel styleClass="stats-grid" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
                         <div class="stat-card">
                             <div class="stat-number">#{dashboardBean.totalBoletosVendidos}</div>
                             <div class="stat-label">Boletos Vendidos</div>
-                            <div class="stat-icon">🎫</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">L. #{String.format('%.2f', dashboardBean.totalIngresos)}</div>
+                            <div class="stat-number">L. #{dashboardBean.totalIngresos}</div>
                             <div class="stat-label">Ingresos Totales</div>
-                            <div class="stat-icon">💰</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">#{dashboardBean.eventosProximos.size()}</div>
                             <div class="stat-label">Eventos Próximos</div>
-                            <div class="stat-icon">📅</div>
                         </div>
                     </p:outputPanel>
 
-                    <!-- Lista de Eventos Próximos -->
+                    <p:outputPanel styleClass="chart-card" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        <h3>Distribución de Eventos por Categoría</h3>
+                        <div style="width: 100%; display: flex; flex-direction: column; gap: 14px; margin-top: 5px;">
+                            <ui:repeat value="#{dashboardBean.categoriasMap.entrySet()}" var="entry">
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.15rem; font-weight: 600; color: #2d2320;">
+                                    <span>#{entry.key}</span>
+                                    <span style="background: #f4ece8; padding: 4px 12px; border-radius: 6px; color: #9c4732;">#{entry.value} eventos</span>
+                                </div>
+                                <div style="width: 100%; background: #f4ece8; height: 12px; border-radius: 6px; overflow: hidden;">
+                                    <div style="width: #{entry.value * 25}%; background: #9c4732; height: 100%; border-radius: 6px; transition: width 0.5s ease;"></div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </p:outputPanel>
+
+
                     <div class="eventos-section">
                         <h2>📅 Eventos Próximos</h2>
                         <p:dataTable value="#{dashboardBean.eventosProximos}" var="evento" styleClass="eventos-table">
@@ -76,13 +290,15 @@
                             <p:column headerText="Categoría" width="15%">
                                 <p:tag value="#{evento.categoria}" severity="info" />
                             </p:column>
-                            <p:column headerText="Fecha" width="20%">
-                                <h:outputText value="#{evento.fechaHora}" />
+                            <p:column headerText="Fecha" width="22%">
+                                <h:outputText value="#{evento.fechaHora}">
+                                    <f:convertDateTime type="localDateTime" pattern="yyyy-MM-dd 'Hora:'HH:mm" />
+                                </h:outputText>
                             </p:column>
                             <p:column headerText="Precio" width="15%">
-                                <h:outputText value="L. #{String.format('%.2f', evento.precioBoleto)}" />
+                                <h:outputText value="L. #{evento.precioBoleto != null ? evento.precioBoleto : 0.00}" />
                             </p:column>
-                            <p:column headerText="Acción" width="20%">
+                            <p:column headerText="Acción" width="18%">
                                 <p:commandButton value="Ver Detalles" icon="pi pi-arrow-right"
                                                  action="#{dashboardBean.verDetalles(evento)}"
                                                  process="@this"
@@ -92,38 +308,29 @@
                         </p:dataTable>
                     </div>
 
-                    <!-- Diálogo de Detalles del Evento -->
                     <p:dialog id="dlgDetalle" header="Detalles del Evento" widgetVar="dlgDetalle" modal="true" responsive="true" width="500">
                         <p:outputPanel id="panelDetalle">
                             <p:outputPanel rendered="#{dashboardBean.eventoDetalles != null}">
                                 <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
                                     <p:outputLabel value="Título:" />
                                     <h:outputText value="#{dashboardBean.eventoDetalles.titulo}" />
-
                                     <p:outputLabel value="Categoría:" />
                                     <p:tag value="#{dashboardBean.eventoDetalles.categoria}" severity="info" />
-
                                     <p:outputLabel value="Fecha y Hora:" />
-                                    <h:outputText value="#{dashboardBean.eventoDetalles.fechaHora}" />
-
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.fechaHora}">
+                                        <f:convertDateTime type="localDateTime" pattern="yyyy-MM-dd 'Hora:'HH:mm" />
+                                    </h:outputText>
                                     <p:outputLabel value="Duración:" />
                                     <h:outputText value="#{dashboardBean.eventoDetalles.duracion} minutos" />
-
                                     <p:outputLabel value="Ubicación:" />
                                     <h:outputText value="#{dashboardBean.eventoDetalles.ubicacion}" />
-
-                                    <p:outputLabel value="Precio del Boleto:" />
-                                    <h:outputText value="L. #{String.format('%.2f', dashboardBean.eventoDetalles.precioBoleto)}" />
-
-                                    <p:outputLabel value="Aforo Máximo:" />
+                                    <p:outputLabel value="Precio:" />
+                                    <h:outputText value="L. #{dashboardBean.eventoDetalles.precioBoleto != null ? dashboardBean.eventoDetalles.precioBoleto : 0.00}" />
+                                    <p:outputLabel value="Aforo:" />
                                     <h:outputText value="#{dashboardBean.eventoDetalles.aforoMaximo}" />
-
                                     <p:outputLabel value="Descripción:" />
-                                    <h:outputText value="#{dashboardBean.eventoDetalles.descripcion}" styleClass="description" escape="false"/>
+                                    <h:outputText value="#{dashboardBean.eventoDetalles.descripcion}" escape="false"/>
                                 </p:panelGrid>
-                            </p:outputPanel>
-                            <p:outputPanel rendered="#{dashboardBean.eventoDetalles == null}">
-                                <p:outputLabel value="Selecciona un evento para ver su información completa." />
                             </p:outputPanel>
                         </p:outputPanel>
                     </p:dialog>

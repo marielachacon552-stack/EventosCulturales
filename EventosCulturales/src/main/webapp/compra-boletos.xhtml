@@ -14,19 +14,16 @@
 <h:body>
     <f:view>
         <div class="app-wrapper">
-            <!-- Barra Lateral / Menú Principal -->
             <h:form>
                 <p:menubar model="#{tuBean.model}" styleClass="navbar">
-                    <p:menuitem value="🏠 Dashboard" url="dashboard.xhtml" />
-                    <p:menuitem value="👤 #{dashboardBean.usuarioActual.nombre} | Salir" action="#{loginBean.logout()}" icon="pi pi-sign-out"/>
+                    <p:menuitem value="Dashboard" url="dashboard.xhtml" />
                 </p:menubar>
             </h:form>
 
-            <!-- Contenedor Principal a la derecha de la barra lateral -->
             <div class="main-container">
                 <h:form id="formCompra">
                     <div class="page-header">
-                        <h1>🎫 Compra y Reserva de Boletos</h1>
+                        <h1>Compra y Reserva de Boletos</h1>
                     </div>
 
                     <p:messages id="mensajes" showDetail="true" closable="true" />
@@ -47,19 +44,16 @@
                                                itemValue="#{evento}"/>
                             </p:selectOneMenu>
 
-                            <p:commandButton value="Cargar Detalles"
+                            <p:commandButton value="Siguiente"
                                              action="#{compraBoletosBean.seleccionarEvento()}"
                                              ajax="true"
                                              update=":formCompra:panelDinamico :formCompra:mensajes"
-                                             icon="pi pi-search"
                                              styleClass="btn-primary" />
                         </p:panelGrid>
                     </p:panel>
 
-                    <!-- Contenedor dinámico -->
-                    <h:panelGroup id="panelDinamico">
 
-                        <!-- Detalles del Evento -->
+                    <h:panelGroup id="panelDinamico">
                         <p:panel header="Detalles del Evento" styleClass="form-panel"
                                  rendered="#{compraBoletosBean.eventoSeleccionado != null}">
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank">
@@ -119,56 +113,93 @@
                         </p:panel>
                     </h:panelGroup>
 
-                    <!-- Mis Reservas y Boletos -->
-                    <p:panel header="🎫 Mis Reservas y Boletos" styleClass="form-panel" style="margin-top: 30px;">
+
+                    <p:panel header="Mis Boletos Registrados" styleClass="form-panel" style="margin-top: 30px;">
                         <p:commandButton value="Recargar Lista"
                                          action="#{compraBoletosBean.cargarBoletosYReservas()}"
                                          ajax="false"
                                          icon="pi pi-refresh"
-                                         style="margin-bottom: 10px;"/>
+                                         style="margin-bottom: 15px;"/>
 
-                        <h3>Mis Boletos</h3>
-                        <p:dataTable id="tblBoletos" value="#{compraBoletosBean.misboletos}" var="boleto" emptyMessage="No tienes boletos">
-                            <p:column headerText="Código"><h:outputText value="#{boleto.codigoBoleto}" /></p:column>
-                            <p:column headerText="Asiento"><h:outputText value="#{boleto.numeroAsiento}" /></p:column>
-                        </p:dataTable>
+                        <p:dataTable id="tblMisBoletos" value="#{compraBoletosBean.misboletos}" var="boleto" emptyMessage="No tienes boletos registrados">
+                            <p:column headerText="Código de Boleto">
+                                <h:outputText value="#{boleto.codigoBoleto}" />
+                            </p:column>
 
-                        <h3 style="margin-top: 30px;">Mis Reservas</h3>
-                        <p:dataTable id="tblReservas" value="#{compraBoletosBean.misReservas}" var="reserva" emptyMessage="No tienes reservas">
-                            <p:column headerText="Evento ID"><h:outputText value="#{reserva.eventoId}" /></p:column>
-                            <p:column headerText="Total"><h:outputText value="L. #{reserva.totalPagado}" /></p:column>
-                            <p:column headerText="Estado"><p:tag value="#{reserva.estado}" severity="success" /></p:column>
+                            <p:column headerText="Asiento">
+                                <h:outputText value="#{boleto.numeroAsiento}" />
+                            </p:column>
+
+                            <p:column headerText="Evento">
+                                <h:outputText value="#{boleto.nombreEvento}" />
+                            </p:column>
+
+                            <p:column headerText="Estado">
+                                <p:tag value="#{boleto.estado}" severity="#{boleto.estado == 'activo' ? 'success' : 'danger'}" />
+                            </p:column>
+
+                            <p:column headerText="Acciones" style="text-align: center;">
+                                <p:commandButton value="Cancelar"
+                                                 action="#{compraBoletosBean.cancelarBoleto(boleto)}"
+                                                 process="@this"
+                                                 immediate="true"
+                                                 update=":formCompra:tblMisBoletos :formCompra:mensajes"
+                                                 styleClass="ui-button-danger"
+                                                 icon="pi pi-times"
+                                                 disabled="#{boleto.estado != 'activo'}">
+                                    <p:confirm header="Confirmación" message="¿Estás seguro de cancelar este boleto?" icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                            </p:column>
                         </p:dataTable>
                     </p:panel>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                        <p:commandButton value="Sí, cancelar" type="button" styleClass="ui-confirmdialog-yes" />
+                    </p:confirmDialog>
                 </h:form>
 
-                <!-- FORMULARIO / DIÁLOGO DE PAGO REALISTA -->
-                <p:dialog header="Pasarela de Pago Seguro" widgetVar="dlgPago" modal="true" resizable="false" responsive="true" width="450">
+                <p:dialog header="Pasarela de Pago Seguro" widgetVar="dlgPago" modal="true" resizable="false" responsive="true" width="450" styleClass="pasarela-pago">
                     <h:form id="formPago">
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank" style="width:100%;">
-                            <p:outputLabel value="Titular de la Tarjeta:" style="font-weight:bold;"/>
-                            <p:inputText required="true" placeholder="Ej. Juan Pérez" style="width:100%;"/>
+                        <div style="display: flex; flex-direction: column; gap: 12px; padding: 5px;">
 
-                            <p:outputLabel value="Número de Tarjeta:" style="font-weight:bold;"/>
-                            <p:inputText required="true" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" style="width:100%;"/>
+                            <!-- Titular -->
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <h:outputLabel value="Titular de la Tarjeta:" style="font-weight: bold; color: #4a2e2b; font-size: 0.9rem;" />
+                                <p:inputText required="true" placeholder="Ej. Juan Pérez" style="width: 100%; padding: 6px;" />
+                            </div>
 
-                            <p:outputLabel value="Fecha de Expiración:" style="font-weight:bold;"/>
-                            <p:inputText required="true" placeholder="MM/AA" maxlength="5" style="width:100%;"/>
+                            <!-- Número de Tarjeta -->
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <h:outputLabel value="Número de Tarjeta:" style="font-weight: bold; color: #4a2e2b; font-size: 0.9rem;" />
+                                <p:inputText required="true" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" style="width: 100%; padding: 6px;" />
+                            </div>
 
-                            <p:outputLabel value="CVV / Código de Seguridad:" style="font-weight:bold;"/>
-                            <p:password required="true" placeholder="123" maxlength="4" style="width:100%;"/>
-                        </p:panelGrid>
+                            <!-- Fila Expiración y CVV -->
+                            <div style="display: flex; gap: 15px;">
+                                <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                                    <h:outputLabel value="Expiración:" style="font-weight: bold; color: #4a2e2b; font-size: 0.9rem;" />
+                                    <p:inputText required="true" placeholder="MM/AA" maxlength="5" style="width: 100%; padding: 6px;" />
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                                    <h:outputLabel value="CVV / Seguridad:" style="font-weight: bold; color: #4a2e2b; font-size: 0.9rem;" />
+                                    <p:password required="true" placeholder="123" maxlength="3" style="width: 100%; padding: 6px;" />
+                                </div>
+                            </div>
 
-                        <div style="margin-top: 20px; text-align: right;">
-                            <p:commandButton value="Cancelar" onclick="PF('dlgPago').hide();" type="button" styleClass="ui-button-secondary" style="margin-right: 10px;"/>
+                        </div>
 
+                        <!-- Botones Alineados Correctamente -->
+                        <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;">
+                            <p:commandButton value="Cancelar" onclick="PF('dlgPago').hide();" type="button" styleClass="ui-button-secondary" style="background-color: #6c757d; border: none; color: white;" />
                             <p:commandButton value="Confirmar y Pagar"
                                              action="#{compraBoletosBean.procesarCompra()}"
                                              oncomplete="PF('dlgPago').hide();"
                                              update=":formCompra"
                                              ajax="false"
                                              icon="pi pi-check"
-                                             styleClass="btn-primary"/>
+                                             styleClass="btn-primary"
+                                             style="background-color: #9c4732; border: none; color: white;" />
                         </div>
                     </h:form>
                 </p:dialog>

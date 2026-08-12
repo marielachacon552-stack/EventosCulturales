@@ -30,7 +30,6 @@ public class EventoDAO {
             pstmt.setString(8, evento.getUbicacion());
             pstmt.executeUpdate();
 
-            // Obtener el ID generado para crear sus asientos automáticamente
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     eventoId = generatedKeys.getInt(1);
@@ -38,21 +37,32 @@ public class EventoDAO {
             }
         }
 
-        // Generar automáticamente los asientos según el aforo máximo usando la tabla correcta (asientos_aforos)
         if (eventoId != -1 && evento.getAforoMaximo() > 0) {
             generarAsientosParaEvento(eventoId, evento.getAforoMaximo());
         }
     }
 
     private void generarAsientosParaEvento(int eventoId, int aforo) {
-        // MODIFICADO: Apunta a asientos_aforos en lugar de asientos
         String sqlAsiento = "INSERT INTO asientos_aforos (evento_id, numero_asiento, estado) VALUES (?, ?, 'disponible')";
         try (Connection conn = dbConnection.getConnection()) {
+            int asientosPorFila = 20;
+            char letraFila = 'A';
+            int contadorFila = 0;
+
             for (int i = 1; i <= aforo; i++) {
+                int numeroAsientoEnFila = contadorFila + 1;
+                String codigoAsiento = letraFila + String.valueOf(numeroAsientoEnFila);
+
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlAsiento)) {
                     pstmt.setInt(1, eventoId);
-                    pstmt.setString(2, "A" + i);
+                    pstmt.setString(2, codigoAsiento);
                     pstmt.executeUpdate();
+                }
+
+                contadorFila++;
+                if (contadorFila >= asientosPorFila) {
+                    contadorFila = 0;
+                    letraFila++;
                 }
             }
         } catch (SQLException e) {
@@ -167,7 +177,7 @@ public class EventoDAO {
         if (fechaCreacionStr != null && !fechaCreacionStr.isEmpty()) {
             if (fechaCreacionStr.contains("T")) {
                 evento.setFechaCreacion(LocalDateTime.parse(fechaCreacionStr));
-            } else if (fechaCreacionStr.contains("@@")) { // fallback
+            } else if (fechaCreacionStr.contains("@@")) {
                 evento.setFechaCreacion(LocalDateTime.now());
             } else if (fechaCreacionStr.contains(" ")) {
                 evento.setFechaCreacion(LocalDateTime.parse(fechaCreacionStr.replace(" ", "T")));

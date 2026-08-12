@@ -75,6 +75,14 @@ public class Usuario {
         this.fechaRegistro = fechaRegistro;
     }
 
+    public String getFechaRegistroFormateada() {
+        if (fechaRegistro != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return fechaRegistro.format(formatter);
+        }
+        return "";
+    }
+
     @Override
     public String toString() {
         return nombre + " (" + correo + ")";

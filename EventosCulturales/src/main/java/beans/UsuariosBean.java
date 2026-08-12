@@ -46,7 +46,7 @@ public class UsuariosBean implements Serializable {
     }
 
     public void abrirDialogoNuevo() {
-        usuarioNuevo = new Usuario(); // ID por defecto será 0 o null (nuevo registro)
+        usuarioNuevo = new Usuario();
         contrasenaNueva = "";
         mostrarDialogo = true;
     }
@@ -58,6 +58,7 @@ public class UsuariosBean implements Serializable {
             this.usuarioNuevo.setNombre(usuarioSeleccionado.getNombre());
             this.usuarioNuevo.setCorreo(usuarioSeleccionado.getCorreo());
             this.usuarioNuevo.setRoleId(usuarioSeleccionado.getRoleId());
+            this.usuarioNuevo.setFechaRegistro(usuarioSeleccionado.getFechaRegistro()); // Conserva la fecha original
             this.contrasenaNueva = "";
             mostrarDialogo = true;
         }
@@ -73,9 +74,7 @@ public class UsuariosBean implements Serializable {
         }
 
         try {
-            // Verificamos si el ID es nulo o 0 para saber si es creación o actualización real
             if (usuarioNuevo.getId() == 0) {
-                // Crear nuevo
                 if (contrasenaNueva == null || contrasenaNueva.trim().isEmpty()) {
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Ingrese una contraseña"));
@@ -92,14 +91,19 @@ public class UsuariosBean implements Serializable {
                             new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El correo ya existe"));
                 }
             } else {
-                // Actualizar usuario existente
+                if (contrasenaNueva != null && !contrasenaNueva.trim().isEmpty()) {
+                    String hashPassword = BCrypt.hashpw(contrasenaNueva, BCrypt.gensalt());
+                    usuarioNuevo.setContrasena(hashPassword);
+                } else {
+                    usuarioNuevo.setContrasena(null);
+                }
+
                 usuarioDAO.update(usuarioNuevo);
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario actualizado correctamente"));
                 mostrarDialogo = false;
                 cargarDatos();
             }
-            // Limpiamos la selección para evitar acoplamientos residuales
             usuarioNuevo = new Usuario();
             usuarioSeleccionado = null;
         } catch (SQLException e) {

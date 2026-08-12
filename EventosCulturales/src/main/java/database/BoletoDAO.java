@@ -25,7 +25,8 @@ public class BoletoDAO {
     }
 
     public Boleto read(int id) throws SQLException {
-        String sql = "SELECT id, evento_id, usuario_id, numero_asiento, estado, fecha_compra, codigo_boleto FROM boletos WHERE id = ?";
+        String sql = "SELECT b.id, b.evento_id, b.usuario_id, b.numero_asiento, b.estado, b.fecha_compra, b.codigo_boleto, e.titulo AS nombre_evento " +
+                "FROM boletos b JOIN eventos e ON b.evento_id = e.id WHERE b.id = ?";
         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -38,7 +39,8 @@ public class BoletoDAO {
 
     public List<Boleto> readAll() throws SQLException {
         List<Boleto> boletos = new ArrayList<>();
-        String sql = "SELECT id, evento_id, usuario_id, numero_asiento, estado, fecha_compra, codigo_boleto FROM boletos ORDER BY fecha_compra DESC";
+        String sql = "SELECT b.id, b.evento_id, b.usuario_id, b.numero_asiento, b.estado, b.fecha_compra, b.codigo_boleto, e.titulo AS nombre_evento " +
+                "FROM boletos b JOIN eventos e ON b.evento_id = e.id ORDER BY b.fecha_compra DESC";
         try (Statement stmt = dbConnection.getConnection().createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -60,6 +62,15 @@ public class BoletoDAO {
         }
     }
 
+    public void updateEstado(int id, String nuevoEstado) throws SQLException {
+        String sql = "UPDATE boletos SET estado = ? WHERE id = ?";
+        try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
+            pstmt.setString(1, nuevoEstado);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        }
+    }
+
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM boletos WHERE id = ?";
         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
@@ -70,7 +81,8 @@ public class BoletoDAO {
 
     public List<Boleto> findByUsuario(int usuarioId) throws SQLException {
         List<Boleto> boletos = new ArrayList<>();
-        String sql = "SELECT id, evento_id, usuario_id, numero_asiento, estado, fecha_compra, codigo_boleto FROM boletos WHERE usuario_id = ? ORDER BY fecha_compra DESC";
+        String sql = "SELECT b.id, b.evento_id, b.usuario_id, b.numero_asiento, b.estado, b.fecha_compra, b.codigo_boleto, e.titulo AS nombre_evento " +
+                "FROM boletos b JOIN eventos e ON b.evento_id = e.id WHERE b.usuario_id = ? ORDER BY b.fecha_compra DESC";
         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, usuarioId);
             ResultSet rs = pstmt.executeQuery();
@@ -83,7 +95,8 @@ public class BoletoDAO {
 
     public List<Boleto> findByEvento(int eventoId) throws SQLException {
         List<Boleto> boletos = new ArrayList<>();
-        String sql = "SELECT id, evento_id, usuario_id, numero_asiento, estado, fecha_compra, codigo_boleto FROM boletos WHERE evento_id = ? ORDER BY fecha_compra DESC";
+        String sql = "SELECT b.id, b.evento_id, b.usuario_id, b.numero_asiento, b.estado, b.fecha_compra, b.codigo_boleto, e.titulo AS nombre_evento " +
+                "FROM boletos b JOIN eventos e ON b.evento_id = e.id WHERE b.evento_id = ? ORDER BY b.fecha_compra DESC";
         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, eventoId);
             ResultSet rs = pstmt.executeQuery();
@@ -119,7 +132,8 @@ public class BoletoDAO {
     }
 
     public Boleto findByCodigoBoleto(String codigo) throws SQLException {
-        String sql = "SELECT id, evento_id, usuario_id, numero_asiento, estado, fecha_compra, codigo_boleto FROM boletos WHERE codigo_boleto = ?";
+        String sql = "SELECT b.id, b.evento_id, b.usuario_id, b.numero_asiento, b.estado, b.fecha_compra, b.codigo_boleto, e.titulo AS nombre_evento " +
+                "FROM boletos b JOIN eventos e ON b.evento_id = e.id WHERE b.codigo_boleto = ?";
         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(sql)) {
             pstmt.setString(1, codigo);
             ResultSet rs = pstmt.executeQuery();
@@ -141,6 +155,13 @@ public class BoletoDAO {
             boleto.setFechaCompra(rs.getTimestamp("fecha_compra").toLocalDateTime());
         }
         boleto.setCodigoBoleto(rs.getString("codigo_boleto"));
+
+        try {
+            boleto.setNombreEvento(rs.getString("nombre_evento"));
+        } catch (SQLException e) {
+            boleto.setNombreEvento("");
+        }
+
         return boleto;
     }
 }

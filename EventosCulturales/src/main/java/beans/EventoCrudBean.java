@@ -8,6 +8,7 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Named(value = "eventoCrudBean")
@@ -34,19 +35,23 @@ public class EventoCrudBean implements Serializable {
     }
 
     public void abrirDialogoNuevo() {
-        // Inicializamos un objeto completamente nuevo con ID 0 para creación
         this.eventoSeleccionado = new Evento();
         this.mostrarDialogo = true;
     }
 
     public void abrirDialogoEditar() {
-        // Si ya viene seleccionado de la tabla, se queda listo para editar
         if (this.eventoSeleccionado != null) {
             this.mostrarDialogo = true;
         }
     }
 
     public void guardar() {
+        if (eventoSeleccionado.getFechaHora() == null || eventoSeleccionado.getFechaHora().isBefore(LocalDateTime.now())) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error de validación", "No se puede programar un evento en una fecha u hora pasada."));
+            return;
+        }
+
         if (!eventService.validarEvento(eventoSeleccionado)) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Validación", "Por favor complete todos los campos correctamente"));
@@ -55,7 +60,6 @@ public class EventoCrudBean implements Serializable {
 
         try {
             if (eventoSeleccionado.getId() == 0) {
-                // Crear nuevo
                 if (eventService.crearEvento(eventoSeleccionado)) {
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento creado correctamente"));
@@ -63,7 +67,6 @@ public class EventoCrudBean implements Serializable {
                     cargarEventos();
                 }
             } else {
-                // Actualizar
                 if (eventService.actualizarEvento(eventoSeleccionado)) {
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Evento actualizado correctamente"));
@@ -98,6 +101,11 @@ public class EventoCrudBean implements Serializable {
     public void cancelar() {
         this.mostrarDialogo = false;
         this.eventoSeleccionado = new Evento();
+    }
+
+    // Método modificado para retornar LocalDateTime para que el mindate del DatePicker funcione perfecto
+    public LocalDateTime getFechaActualMinima() {
+        return LocalDateTime.now();
     }
 
     // Getters y Setters

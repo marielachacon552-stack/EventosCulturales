@@ -44,7 +44,6 @@ public class DatabaseConnection {
                     "nombre TEXT NOT NULL UNIQUE" +
                     ")");
 
-            // Tabla Usuarios
             stmt.execute("CREATE TABLE IF NOT EXISTS usuarios (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "nombre TEXT NOT NULL," +
@@ -55,12 +54,10 @@ public class DatabaseConnection {
                     "FOREIGN KEY (roleId) REFERENCES roles(id)" +
                     ")");
 
-            // Insertar roles base
             stmt.execute("INSERT OR IGNORE INTO roles (id, nombre) VALUES (1, 'Administrador')");
             stmt.execute("INSERT OR IGNORE INTO roles (id, nombre) VALUES (2, 'Organizador')");
             stmt.execute("INSERT OR IGNORE INTO roles (id, nombre) VALUES (3, 'Cliente')");
 
-            // Insertar usuario Admin con el hash BCrypt correcto y asegurando actualización
             stmt.execute("INSERT OR REPLACE INTO usuarios (id, nombre, correo, contrasena_hash, roleId) " +
                     "VALUES (1, 'Admin Sistema', 'admin@eventos.hn', '$2a$10$TMrAOtZ7V8esQNynIrwQt.DFp0z7NMOj/4Q7iITKgXl8nYSTwVZiu', 1)");
 

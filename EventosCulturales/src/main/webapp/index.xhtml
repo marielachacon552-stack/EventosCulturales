@@ -8,39 +8,45 @@
 <h:head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Iniciar Sesión - Eventos Culturales</title>
+    <title>CatrachArte - Iniciar Sesión</title>
     <link rel="stylesheet" href="css/principal.css"/>
 </h:head>
 
 <h:body>
-    <f:view>
-        <div class="login-container">
-            <h:form styleClass="login-box">
-                <div class="login-header">
-                    <h1>🎭 Eventos Culturales</h1>
-                    <p>Inicie sesión para continuar</p>
-                </div>
-
-                <p:growl id="growl" showDetail="true" closable="true"/>
-
-                <p:panel header="Credenciales de Acceso" styleClass="form-panel">
-                    <div class="form-group">
-                        <h:outputLabel for="username" value="Correo electrónico:" />
-                        <p:inputText id="username" value="#{loginBean.correo}" required="true" styleClass="form-control" placeholder="correo@ejemplo.com"/>
-                    </div>
-
-                    <div class="form-group">
-                        <h:outputLabel for="password" value="Contraseña:" />
-                        <p:password id="password" value="#{loginBean.contrasena}" required="true" styleClass="form-control" toggleMask="true"/>
-                    </div>
-
-                    <p:commandButton value="Iniciar Sesión"
-                                     action="#{loginBean.login}"
-                                     update="growl"
-                                     styleClass="btn-login" />
-                </p:panel>
-            </h:form>
+    <div class="catracharte-theme">
+        <div class="login-top-bar">
+            Sistema de Reservas Culturales - CatrachArte
         </div>
-    </f:view>
+
+        <f:view>
+            <div class="login-container">
+                <h:form styleClass="login-box">
+                    <div class="login-header">
+                        <h1>Bienvenido</h1>
+                        <p>Inicie sesión para continuar</p>
+                    </div>
+
+                    <p:growl id="growl" showDetail="true" closable="true"/>
+
+                    <p:panel header="Credenciales de Acceso" styleClass="form-panel">
+                        <div class="form-group">
+                            <h:outputLabel for="username" value="Correo electrónico:" />
+                            <p:inputText id="username" value="#{loginBean.correo}" required="true" styleClass="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <h:outputLabel for="password" value="Contraseña:" />
+                            <p:password id="password" value="#{loginBean.contrasena}" required="true" toggleMask="true" styleClass="form-control" />
+                        </div>
+
+                        <p:commandButton value="Iniciar Sesión"
+                                         action="#{loginBean.login}"
+                                         update="growl"
+                                         styleClass="btn-login" />
+                    </p:panel>
+                </h:form>
+            </div>
+        </f:view>
+    </div>
 </h:body>
 </html>

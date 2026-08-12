@@ -9,7 +9,7 @@ public class UsuarioDAO {
 
     public List<Usuario> readAll() throws SQLException {
         List<Usuario> lista = new ArrayList<>();
-        String sql = "SELECT id, nombre, correo, roleId FROM usuarios";
+        String sql = "SELECT id, nombre, correo, roleId, fecha_registro FROM usuarios";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -19,6 +19,13 @@ public class UsuarioDAO {
                 u.setNombre(rs.getString("nombre"));
                 u.setCorreo(rs.getString("correo"));
                 u.setRoleId(rs.getInt("roleId"));
+
+                // Conversión correcta de Timestamp a LocalDateTime
+                Timestamp timestamp = rs.getTimestamp("fecha_registro");
+                if (timestamp != null) {
+                    u.setFechaRegistro(timestamp.toLocalDateTime());
+                }
+
                 lista.add(u);
             }
         }
@@ -26,13 +33,29 @@ public class UsuarioDAO {
     }
 
     public boolean update(Usuario usuario) throws SQLException {
-        String sql = "UPDATE usuarios SET nombre = ?, correo = ?, roleId = ? WHERE id = ?";
+        boolean actualizarPass = (usuario.getContrasena() != null && !usuario.getContrasena().trim().isEmpty());
+        String sql;
+
+        if (actualizarPass) {
+            sql = "UPDATE usuarios SET nombre = ?, correo = ?, contrasena_hash = ?, roleId = ? WHERE id = ?";
+        } else {
+            sql = "UPDATE usuarios SET nombre = ?, correo = ?, roleId = ? WHERE id = ?";
+        }
+
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getCorreo());
-            pstmt.setInt(3, usuario.getRoleId());
-            pstmt.setInt(4, usuario.getId());
+
+            if (actualizarPass) {
+                pstmt.setString(3, usuario.getContrasena());
+                pstmt.setInt(4, usuario.getRoleId());
+                pstmt.setInt(5, usuario.getId());
+            } else {
+                pstmt.setInt(3, usuario.getRoleId());
+                pstmt.setInt(4, usuario.getId());
+            }
+
             return pstmt.executeUpdate() > 0;
         }
     }
@@ -47,7 +70,7 @@ public class UsuarioDAO {
     }
 
     public Usuario read(int id) throws SQLException {
-        String sql = "SELECT id, nombre, correo, roleId FROM usuarios WHERE id = ?";
+        String sql = "SELECT id, nombre, correo, roleId, fecha_registro FROM usuarios WHERE id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
@@ -58,6 +81,12 @@ public class UsuarioDAO {
                     u.setNombre(rs.getString("nombre"));
                     u.setCorreo(rs.getString("correo"));
                     u.setRoleId(rs.getInt("roleId"));
+
+                    Timestamp timestamp = rs.getTimestamp("fecha_registro");
+                    if (timestamp != null) {
+                        u.setFechaRegistro(timestamp.toLocalDateTime());
+                    }
+
                     return u;
                 }
             }
@@ -66,7 +95,7 @@ public class UsuarioDAO {
     }
 
     public Usuario findByCorreo(String correo) throws SQLException {
-        String sql = "SELECT id, nombre, correo, contrasena_hash, roleId FROM usuarios WHERE correo = ?";
+        String sql = "SELECT id, nombre, correo, contrasena_hash, roleId, fecha_registro FROM usuarios WHERE correo = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, correo);
@@ -78,6 +107,12 @@ public class UsuarioDAO {
                     u.setCorreo(rs.getString("correo"));
                     u.setContrasena(rs.getString("contrasena_hash"));
                     u.setRoleId(rs.getInt("roleId"));
+
+                    Timestamp timestamp = rs.getTimestamp("fecha_registro");
+                    if (timestamp != null) {
+                        u.setFechaRegistro(timestamp.toLocalDateTime());
+                    }
+
                     return u;
                 }
             }

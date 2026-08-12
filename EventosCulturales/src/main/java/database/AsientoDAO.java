@@ -82,10 +82,10 @@ public class AsientoDAO {
             }
         }
 
-        // Si no existen asientos creados para este evento, los generamos automáticamente basados en su aforo
+
         if (asientos.isEmpty()) {
             generarAsientosFaltantesParaEvento(eventoId);
-            asientos = findByEvento(eventoId); // Volver a consultar ya creados
+            asientos = findByEvento(eventoId); //
         }
 
         return asientos;
@@ -104,11 +104,9 @@ public class AsientoDAO {
             }
         }
 
-        // Si la lista está vacía, aseguramos verificar la generación automática
         if (asientos.isEmpty()) {
-            List<Asiento> totalAsientos = findByEvento(eventoId); // Esto los crea si no existen
+            List<Asiento> totalAsientos = findByEvento(eventoId);
             if (!totalAsientos.isEmpty()) {
-                // Filtramos de nuevo los disponibles
                 for (Asiento a : totalAsientos) {
                     if ("disponible".equalsIgnoreCase(a.getEstado())) {
                         asientos.add(a);
@@ -128,7 +126,6 @@ public class AsientoDAO {
             if (rs.next()) {
                 int count = rs.getInt(1);
                 if (count == 0) {
-                    // Forzar verificación y creación si es 0
                     List<Asiento> disponibles = findDisponiblesByEvento(eventoId);
                     return disponibles.size();
                 }
@@ -163,11 +160,25 @@ public class AsientoDAO {
 
             if (aforo > 0) {
                 String sqlInsert = "INSERT INTO asientos_aforos (evento_id, numero_asiento, estado) VALUES (?, ?, 'disponible')";
+
+                int asientosPorFila = 20;
+                char letraFila = 'A';
+                int contadorFila = 0;
+
                 for (int i = 1; i <= aforo; i++) {
+                    int numeroAsientoEnFila = contadorFila + 1;
+                    String codigoAsiento = String.format("%c%02d", letraFila, numeroAsientoEnFila);
+
                     try (PreparedStatement stmtIns = conn.prepareStatement(sqlInsert)) {
                         stmtIns.setInt(1, eventoId);
-                        stmtIns.setString(2, "A" + i);
+                        stmtIns.setString(2, codigoAsiento);
                         stmtIns.executeUpdate();
+                    }
+
+                    contadorFila++;
+                    if (contadorFila >= asientosPorFila) {
+                        contadorFila = 0;
+                        letraFila++;
                     }
                 }
             }

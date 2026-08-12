@@ -14,23 +14,19 @@ public class SecurityPhaseListener implements PhaseListener {
         FacesContext context = event.getFacesContext();
         String requestPath = context.getExternalContext().getRequestServletPath();
 
-        // Páginas que no requieren autenticación
-        if (requestPath.contains("login.xhtml") || requestPath.contains("index.xhtml")) {
+        if (requestPath.contains("index.xhtml")) {
             return;
         }
 
-        // Verificar si el usuario está autenticado
         Usuario usuario = (Usuario) context.getExternalContext().getSessionMap().get("usuarioActual");
         if (usuario == null) {
-            // Redirigir al login
             NavigationHandler nh = context.getApplication().getNavigationHandler();
-            nh.handleNavigation(context, null, "redirect:login.xhtml");
+            nh.handleNavigation(context, null, "redirect:index.xhtml");
         }
     }
 
     @Override
     public void beforePhase(PhaseEvent event) {
-        // No implementado
     }
 
     @Override

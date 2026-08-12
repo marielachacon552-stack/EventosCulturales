@@ -20,11 +20,9 @@ public class AuthenticationService {
             System.out.println("Contrasena/Hash en BD: " + usuario.getContrasena());
 
             boolean match = false;
-            // Si la contraseña en la BD no empieza con $2a$ (no es un hash de BCrypt), compárala plano contra plano
             if (usuario.getContrasena() != null && !usuario.getContrasena().startsWith("$2a$")) {
                 match = contrasena.equals(usuario.getContrasena());
             } else {
-                // Si es un hash válido, usa BCrypt normalmente
                 match = BCrypt.checkpw(contrasena, usuario.getContrasena());
             }
 
@@ -38,12 +36,11 @@ public class AuthenticationService {
     public boolean registrar(Usuario usuario, String contrasenaPlana) throws SQLException {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
 
-        // Verificar si el correo ya existe
+
         if (usuarioDAO.findByCorreo(usuario.getCorreo()) != null) {
             return false;
         }
 
-        // Hashear la contraseña antes de guardarla
         String hashContrasena = BCrypt.hashpw(contrasenaPlana, BCrypt.gensalt());
         usuario.setContrasena(hashContrasena);
 

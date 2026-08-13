@@ -103,7 +103,7 @@ public class EventoCrudBean implements Serializable {
         this.eventoSeleccionado = new Evento();
     }
 
-    // Método modificado para retornar LocalDateTime para que el mindate del DatePicker funcione perfecto
+
     public LocalDateTime getFechaActualMinima() {
         return LocalDateTime.now();
     }

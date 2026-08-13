@@ -7,7 +7,7 @@ import database.BoletoDAO;
 import database.ReservaDAO;
 import database.AsientoDAO;
 import jakarta.inject.Named;
-import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.view.ViewScoped; // <-- Cambiado de SessionScoped a ViewScoped para refrescar datos por vista
 import jakarta.faces.context.FacesContext;
 import jakarta.annotation.PostConstruct;
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 @Named(value = "dashboardBean")
-@SessionScoped
+@ViewScoped // <-- Actualizado aquí
 public class DashboardBean implements Serializable {
     private EventoDAO eventoDAO;
     private BoletoDAO boletoDAO;

@@ -8,10 +8,10 @@ import data.Usuario;
 import database.EventoDAO;
 import database.UsuarioDAO;
 import database.AsientoDAO;
-import database.BoletoDAO; // Importación necesaria
+import database.BoletoDAO;
 import services.CompraService;
 import jakarta.inject.Named;
-import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.view.ViewScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Named(value = "compraBoletosBean")
-@SessionScoped
+@ViewScoped
 public class CompraBoletosBean implements Serializable {
     private EventoDAO eventoDAO;
     private AsientoDAO asientoDAO;
     private UsuarioDAO usuarioDAO;
-    private BoletoDAO boletoDAO; // Nuevo atributo
+    private BoletoDAO boletoDAO;
     private CompraService compraService;
 
     private List<Evento> eventos;
@@ -40,20 +40,29 @@ public class CompraBoletosBean implements Serializable {
         this.eventoDAO = new EventoDAO();
         this.asientoDAO = new AsientoDAO();
         this.usuarioDAO = new UsuarioDAO();
-        this.boletoDAO = new BoletoDAO(); // Inicialización
+        this.boletoDAO = new BoletoDAO();
         this.compraService = new CompraService();
         this.asientosSeleccionados = new ArrayList<>();
         cargarEventos();
         cargarBoletosYReservas();
     }
 
-
     public void cancelarBoleto(Boleto boleto) {
         try {
+            // 1. Cambiar estado del boleto a cancelado
             boletoDAO.updateEstado(boleto.getId(), "cancelado");
+
+            // 2. Liberar el asiento correspondiente en la base de datos (cambiar a 'disponible')
+            asientoDAO.updateEstado(boleto.getEventoId(), boleto.getNumeroAsiento(), "disponible");
+
+            // 3. Recargar listas y vista
             cargarBoletosYReservas();
+            if (eventoSeleccionado != null && eventoSeleccionado.getId() == boleto.getEventoId()) {
+                seleccionarEvento();
+            }
+
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "El boleto ha sido cancelado correctamente."));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "El boleto ha sido cancelado y el asiento liberado correctamente."));
 
         } catch (SQLException e) {
             e.printStackTrace();

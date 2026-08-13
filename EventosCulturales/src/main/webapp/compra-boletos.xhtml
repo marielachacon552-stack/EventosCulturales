@@ -16,7 +16,9 @@
         <div class="app-wrapper">
             <h:form>
                 <p:menubar model="#{tuBean.model}" styleClass="navbar">
-                    <p:menuitem value="Dashboard" url="dashboard.xhtml" />
+                    <p:menuitem value="Dashboard"
+                                url="dashboard.xhtml"
+                                icon="pi pi-home"/>
                 </p:menubar>
             </h:form>
 
@@ -142,8 +144,7 @@
                                 <p:commandButton value="Cancelar"
                                                  action="#{compraBoletosBean.cancelarBoleto(boleto)}"
                                                  process="@this"
-                                                 immediate="true"
-                                                 update=":formCompra:tblMisBoletos :formCompra:mensajes"
+                                                 update="tblMisBoletos :formCompra:mensajes"
                                                  styleClass="ui-button-danger"
                                                  icon="pi pi-times"
                                                  disabled="#{boleto.estado != 'activo'}">
@@ -155,7 +156,7 @@
 
                     <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
                         <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
-                        <p:commandButton value="Sí, cancelar" type="button" styleClass="ui-confirmdialog-yes" />
+                        <p:commandButton value="Sí, cancelar" type="button" styleClass="ui-confirmdialog-yes ui-button-danger" />
                     </p:confirmDialog>
                 </h:form>
 

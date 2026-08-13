@@ -11,6 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Eventos Culturales - Dashboard</title>
     <link rel="stylesheet" href="css/principal.css"/>
+    <h:outputStylesheet library="primefaces" name="primeicons/primeicons.css"/>
+
     <style>
         * {
             margin: 0;
@@ -216,30 +218,49 @@
         <div class="app-wrapper">
             <div class="navbar custom-sidebar">
                 <h:form styleClass="custom-sidebar-form">
+
                     <h:outputLink value="dashboard.xhtml" styleClass="menu-link">
+                        <i class="pi pi-home"></i>
                         Dashboard
                     </h:outputLink>
 
-                    <h:outputLink value="eventos-admin.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                    <h:outputLink value="eventos-admin.xhtml"
+                                  styleClass="menu-link"
+                                  rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        <i class="pi pi-calendar"></i>
                         Administrar Eventos
                     </h:outputLink>
 
-                    <h:outputLink value="compra-boletos.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esCliente()}">
+                    <h:outputLink value="compra-boletos.xhtml"
+                                  styleClass="menu-link"
+                                  rendered="#{dashboardBean.esCliente()}">
+                        <i class="pi pi-ticket"></i>
                         Comprar Boletos
                     </h:outputLink>
 
-                    <h:outputLink value="reportes.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                    <h:outputLink value="reportes.xhtml"
+                                  styleClass="menu-link"
+                                  rendered="#{dashboardBean.esAdmin() or dashboardBean.esOrganizador()}">
+                        <i class="pi pi-chart-bar"></i>
                         Ver Reportes
                     </h:outputLink>
 
-                    <h:outputLink value="usuarios-admin.xhtml" styleClass="menu-link" rendered="#{dashboardBean.esAdmin()}">
+                    <h:outputLink value="usuarios-admin.xhtml"
+                                  styleClass="menu-link"
+                                  rendered="#{dashboardBean.esAdmin()}">
+                        <i class="pi pi-users"></i>
                         Gestionar Usuarios
                     </h:outputLink>
 
-                    <h:commandLink value="Salir (#{dashboardBean.usuarioActual.nombre})"
-                                   action="#{loginBean.logout()}"
+                    <h:commandLink action="#{loginBean.logout()}"
                                    styleClass="menu-link"
-                                   style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 15px;" />
+                                   style="border-top:1px solid rgba(255,255,255,.2); margin-top:15px;">
+
+                        <i class="pi pi-sign-out"></i>
+                        Salir (#{dashboardBean.usuarioActual.nombre})
+
+                    </h:commandLink>
+
                 </h:form>
             </div>
 
@@ -282,7 +303,7 @@
 
 
                     <div class="eventos-section">
-                        <h2>📅 Eventos Próximos</h2>
+                        <h2>Eventos Próximos</h2>
                         <p:dataTable value="#{dashboardBean.eventosProximos}" var="evento" styleClass="eventos-table">
                             <p:column headerText="Evento" width="30%">
                                 <h:outputText value="#{evento.titulo}" />

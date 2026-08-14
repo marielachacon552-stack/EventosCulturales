@@ -20,7 +20,7 @@ public class UsuarioDAO {
                 u.setCorreo(rs.getString("correo"));
                 u.setRoleId(rs.getInt("roleId"));
 
-                // Conversión correcta de Timestamp a LocalDateTime
+
                 Timestamp timestamp = rs.getTimestamp("fecha_registro");
                 if (timestamp != null) {
                     u.setFechaRegistro(timestamp.toLocalDateTime());

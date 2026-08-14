@@ -49,13 +49,11 @@ public class CompraBoletosBean implements Serializable {
 
     public void cancelarBoleto(Boleto boleto) {
         try {
-            // 1. Cambiar estado del boleto a cancelado
+
             boletoDAO.updateEstado(boleto.getId(), "cancelado");
 
-            // 2. Liberar el asiento correspondiente en la base de datos (cambiar a 'disponible')
             asientoDAO.updateEstado(boleto.getEventoId(), boleto.getNumeroAsiento(), "disponible");
 
-            // 3. Recargar listas y vista
             cargarBoletosYReservas();
             if (eventoSeleccionado != null && eventoSeleccionado.getId() == boleto.getEventoId()) {
                 seleccionarEvento();
